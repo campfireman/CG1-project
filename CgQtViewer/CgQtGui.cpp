@@ -234,7 +234,7 @@ void CgQtGui::slotRGBGreenInputChanged(int value)
 }
 void CgQtGui::slotRGBBlueInputChanged(int value)
 {
-    CgBaseEvent *e = new CgColorChangeEvent(Cg::CgColorChangeEvent, Cg::Red, value);
+    CgBaseEvent *e = new CgColorChangeEvent(Cg::CgColorChangeEvent, Cg::Blue, value);
     notifyObserver(e);
 }
 void CgQtGui::slotMyCheckBox1Changed()

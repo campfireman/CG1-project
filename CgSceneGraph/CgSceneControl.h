@@ -26,6 +26,7 @@ private:
 
     CgCube *m_cube;
     std::vector<CgPolyline *> m_lines;
+    int m_rgb[3];
 
     glm::mat4 m_current_transformation;
     glm::mat4 m_trackball_rotation;

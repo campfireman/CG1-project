@@ -5,6 +5,7 @@
 #include "CgEvents/CgWindowResizeEvent.h"
 #include "CgEvents/CgLoadObjFileEvent.h"
 #include "CgEvents/CgTrackballEvent.h"
+#include "CgEvents/CgColorChangeEvent.h"
 #include "CgBase/CgBaseRenderer.h"
 #include "CgExampleTriangle.h"
 #include "CgCube.h"
@@ -20,7 +21,7 @@ CgSceneControl::CgSceneControl()
     m_lookAt_matrix = glm::lookAt(glm::vec3(0.0, 0.0, 1.0), glm::vec3(0.0, 0.0, 0.0), glm::vec3(0.0, 1.0, 0.0));
     m_proj_matrix = glm::mat4x4(glm::vec4(1.792591, 0.0, 0.0, 0.0), glm::vec4(0.0, 1.792591, 0.0, 0.0), glm::vec4(0.0, 0.0, -1.0002, -1.0), glm::vec4(0.0, 0.0, -0.020002, 0.0));
     m_trackball_rotation = glm::mat4(1.);
-    m_cube = new CgCube();
+    m_cube = new CgCube(42);
     m_lines = m_cube->getTriangleNormals();
 }
 
@@ -50,7 +51,7 @@ void CgSceneControl::renderObjects()
     // Materialeigenschaften setzen
     // sollte ja eigentlich pro Objekt unterschiedlich sein können, naja bekommen sie schon hin....
 
-    m_renderer->setUniformValue("mycolor", glm::vec4(0.0, 1.0, 0.0, 1.0));
+    // m_renderer->setUniformValue("mycolor", glm::vec4(0.0, 1.0, 0.0, 1.0));
 
     m_renderer->setUniformValue("matDiffuseColor", glm::vec4(0.35, 0.31, 0.09, 1.0));
     m_renderer->setUniformValue("lightDiffuseColor", glm::vec4(1.0, 1.0, 1.0, 1.0));
@@ -161,6 +162,14 @@ void CgSceneControl::handleEvent(CgBaseEvent *e)
         m_renderer->redraw();
     }
 
+    if (e->getType() & Cg::CgColorChangeEvent)
+    {
+        CgColorChangeEvent *ev = (CgColorChangeEvent *)e;
+        std::cout << ev->getColor() << std::endl;
+        m_rgb[ev->getColor()] = ev->getValue();
+        m_renderer->setUniformValue("mycolor", glm::vec4(m_rgb[0], m_rgb[1], m_rgb[2], 1.0));
+        m_renderer->redraw();
+    }
     // an der Stelle an der ein Event abgearbeitet ist wird es auch gelöscht.
     delete e;
 }

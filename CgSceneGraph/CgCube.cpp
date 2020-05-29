@@ -2,8 +2,7 @@
 #include "CgBase/CgEnums.h"
 #include "CgUtils/ObjLoader.h"
 
-CgCube::CgCube() : m_type(Cg::TriangleMesh),
-                   m_id(42)
+CgCube::CgCube(int id) : m_id(id), m_type(Cg::TriangleMesh)
 {
     m_vertices.push_back(glm::vec3(0.5, 0.5, 0.5));    // 0
     m_vertices.push_back(glm::vec3(-0.5, 0.5, 0.5));   // 1
@@ -61,13 +60,6 @@ CgCube::CgCube() : m_type(Cg::TriangleMesh),
     m_triangle_indices.push_back(2);
     m_triangle_indices.push_back(3);
 
-    m_vertex_normals.push_back(glm::vec3(-1.0, -1.0, 0.0));
-    m_vertex_normals.push_back(glm::vec3(-1.0, -1.0, 0.0));
-    m_vertex_normals.push_back(glm::vec3(-1.0, -1.0, 0.0));
-    m_vertex_normals.push_back(glm::vec3(-1.0, -1.0, 0.0));
-    m_vertex_normals.push_back(glm::vec3(-1.0, -1.0, 0.0));
-    m_vertex_normals.push_back(glm::vec3(-1.0, -1.0, 0.0));
-
     for (int i = 0; i < m_triangle_indices.size(); i += 3)
     {
         auto p_0 = m_vertices[m_triangle_indices[i]];
@@ -76,30 +68,8 @@ CgCube::CgCube() : m_type(Cg::TriangleMesh),
 
         auto centroid = (p_0 + p_1 + p_2) * glm::vec3(1.0 / 3, 1.0 / 3, 1.0 / 3);
         auto normal = glm::normalize(glm::cross(p_1 - p_0, p_2 - p_0));
-        m_triangle_normals.push_back(new CgPolyline(100 + i, std::vector<glm::vec3>{centroid, centroid + normal}, glm::vec3(0, 0, 0), 1));
+        m_triangle_normals.push_back(new CgPolyline(m_id + 100 + i, std::vector<glm::vec3>{centroid, centroid + normal}, glm::vec3(255.0, 80.0, 30.0), 1));
     }
-}
-
-CgCube::CgCube(int id) : m_type(Cg::TriangleMesh),
-                         m_id(id)
-{
-
-    m_vertices.push_back(glm::vec3(-0.5, 0.0, 0.0));
-    m_vertices.push_back(glm::vec3(0.0, -0.5, 0.0));
-    m_vertices.push_back(glm::vec3(0.0, 0.5, 0.0));
-    m_vertices.push_back(glm::vec3(0.5, 0.0, 0.0));
-
-    m_triangle_indices.push_back(0);
-    m_triangle_indices.push_back(1);
-    m_triangle_indices.push_back(2);
-    m_triangle_indices.push_back(2);
-    m_triangle_indices.push_back(1);
-    m_triangle_indices.push_back(3);
-
-    m_vertex_normals.push_back(glm::vec3(0.0, 0.0, 1.0));
-    m_vertex_normals.push_back(glm::vec3(0.0, 0.0, 1.0));
-    m_vertex_normals.push_back(glm::vec3(0.0, 0.0, 1.0));
-    m_vertex_normals.push_back(glm::vec3(0.0, 0.0, 1.0));
 }
 
 CgCube::~CgCube()

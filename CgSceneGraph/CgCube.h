@@ -11,7 +11,6 @@ class CgCube : public CgBaseTriangleMesh
 {
 
 public:
-    CgCube();
     CgCube(int id);
 
     ~CgCube();
