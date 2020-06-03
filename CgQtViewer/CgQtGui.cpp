@@ -122,6 +122,34 @@ QSlider *CgQtGui::createSlider()
 void CgQtGui::createOptionPanelExample1(QWidget *parent)
 {
     QVBoxLayout *tab1_control = new QVBoxLayout();
+    QHBoxLayout *subBox = new QHBoxLayout();
+
+    /* Control which object type to draw */
+    QGroupBox *myGroupBox = new QGroupBox("Choose the object to draw");
+    // select object type
+    myButtonGroup = new QButtonGroup(subBox);
+    myButtonGroup->setExclusive(true);
+
+    QRadioButton *radiobutton1 = new QRadioButton("Cube");
+    QRadioButton *radiobutton2 = new QRadioButton("Rotation Body");
+
+    radiobutton1->setChecked(true);
+
+    myButtonGroup->addButton(radiobutton1, 0);
+    myButtonGroup->addButton(radiobutton2, 1);
+
+    QVBoxLayout *vbox = new QVBoxLayout;
+    vbox->addWidget(radiobutton1);
+    vbox->addWidget(radiobutton2);
+    vbox->addStretch(1);
+    myGroupBox->setLayout(vbox);
+    subBox->addWidget(myGroupBox);
+    tab1_control->addLayout(subBox);
+
+    QPushButton *drawButton = new QPushButton("Draw!");
+    tab1_control->addWidget(drawButton);
+
+    connect(drawButton, SIGNAL(clicked()), this, SLOT(slotMyButton1Pressed()));
 
     /*Example for using a label */
 
@@ -159,18 +187,18 @@ void CgQtGui::createOptionPanelExample1(QWidget *parent)
     tab1_control->addWidget(RGBBlueInput);
     /*Example for using a checkbox */
 
-    myCheckBox1 = new QCheckBox("enable Option 1");
-    myCheckBox1->setCheckable(true);
-    myCheckBox1->setChecked(false);
-    connect(myCheckBox1, SIGNAL(clicked()), this, SLOT(slotMyCheckBox1Changed()));
-    tab1_control->addWidget(myCheckBox1);
+    // myCheckBox1 = new QCheckBox("enable Option 1");
+    // myCheckBox1->setCheckable(true);
+    // myCheckBox1->setChecked(false);
+    // connect(myCheckBox1, SIGNAL(clicked()), this, SLOT(slotMyCheckBox1Changed()));
+    // tab1_control->addWidget(myCheckBox1);
 
     /*Example for using a button */
 
-    QPushButton *myButton1 = new QPushButton("&drueck mich");
-    tab1_control->addWidget(myButton1);
+    // QPushButton *myButton1 = new QPushButton("&drueck mich");
+    // tab1_control->addWidget(myButton1);
 
-    connect(myButton1, SIGNAL(clicked()), this, SLOT(slotMyButton1Pressed()));
+    // connect(myButton1, SIGNAL(clicked()), this, SLOT(slotMyButton1Pressed()));
 
     parent->setLayout(tab1_control);
 }
