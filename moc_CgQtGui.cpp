@@ -21,8 +21,8 @@ QT_BEGIN_MOC_NAMESPACE
 QT_WARNING_PUSH
 QT_WARNING_DISABLE_DEPRECATED
 struct qt_meta_stringdata_CgQtGui_t {
-    QByteArrayData data[15];
-    char stringdata0[247];
+    QByteArrayData data[16];
+    char stringdata0[258];
 };
 #define QT_MOC_LITERAL(idx, ofs, len) \
     Q_STATIC_BYTE_ARRAY_DATA_HEADER_INITIALIZER_WITH_OFFSET(len, \
@@ -42,18 +42,20 @@ QT_MOC_LITERAL(7, 76, 22), // "slotRGBRedInputChanged"
 QT_MOC_LITERAL(8, 99, 5), // "value"
 QT_MOC_LITERAL(9, 105, 24), // "slotRGBGreenInputChanged"
 QT_MOC_LITERAL(10, 130, 23), // "slotRGBBlueInputChanged"
-QT_MOC_LITERAL(11, 154, 22), // "slotMyCheckBox1Changed"
-QT_MOC_LITERAL(12, 177, 20), // "slotMyButton1Pressed"
-QT_MOC_LITERAL(13, 198, 31), // "slotButtonGroupSelectionChanged"
-QT_MOC_LITERAL(14, 230, 16) // "slotLoadMeshFile"
+QT_MOC_LITERAL(11, 154, 26), // "slotShowFaceNormalsChanged"
+QT_MOC_LITERAL(12, 181, 5), // "state"
+QT_MOC_LITERAL(13, 187, 21), // "slotDrawButtonPressed"
+QT_MOC_LITERAL(14, 209, 31), // "slotButtonGroupSelectionChanged"
+QT_MOC_LITERAL(15, 241, 16) // "slotLoadMeshFile"
 
     },
     "CgQtGui\0mouseEvent\0\0QMouseEvent*\0event\0"
     "viewportChanged\0slotTrackballChanged\0"
     "slotRGBRedInputChanged\0value\0"
     "slotRGBGreenInputChanged\0"
-    "slotRGBBlueInputChanged\0slotMyCheckBox1Changed\0"
-    "slotMyButton1Pressed\0"
+    "slotRGBBlueInputChanged\0"
+    "slotShowFaceNormalsChanged\0state\0"
+    "slotDrawButtonPressed\0"
     "slotButtonGroupSelectionChanged\0"
     "slotLoadMeshFile"
 };
@@ -79,10 +81,10 @@ static const uint qt_meta_data_CgQtGui[] = {
        7,    1,   73,    2, 0x08 /* Private */,
        9,    1,   76,    2, 0x08 /* Private */,
       10,    1,   79,    2, 0x08 /* Private */,
-      11,    0,   82,    2, 0x08 /* Private */,
-      12,    0,   83,    2, 0x08 /* Private */,
-      13,    0,   84,    2, 0x08 /* Private */,
-      14,    0,   85,    2, 0x08 /* Private */,
+      11,    1,   82,    2, 0x08 /* Private */,
+      13,    0,   85,    2, 0x08 /* Private */,
+      14,    0,   86,    2, 0x08 /* Private */,
+      15,    0,   87,    2, 0x08 /* Private */,
 
  // slots: parameters
     QMetaType::Void, 0x80000000 | 3,    4,
@@ -91,7 +93,7 @@ static const uint qt_meta_data_CgQtGui[] = {
     QMetaType::Void, QMetaType::Int,    8,
     QMetaType::Void, QMetaType::Int,    8,
     QMetaType::Void, QMetaType::Int,    8,
-    QMetaType::Void,
+    QMetaType::Void, QMetaType::Int,   12,
     QMetaType::Void,
     QMetaType::Void,
     QMetaType::Void,
@@ -111,8 +113,8 @@ void CgQtGui::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id, voi
         case 3: _t->slotRGBRedInputChanged((*reinterpret_cast< int(*)>(_a[1]))); break;
         case 4: _t->slotRGBGreenInputChanged((*reinterpret_cast< int(*)>(_a[1]))); break;
         case 5: _t->slotRGBBlueInputChanged((*reinterpret_cast< int(*)>(_a[1]))); break;
-        case 6: _t->slotMyCheckBox1Changed(); break;
-        case 7: _t->slotMyButton1Pressed(); break;
+        case 6: _t->slotShowFaceNormalsChanged((*reinterpret_cast< int(*)>(_a[1]))); break;
+        case 7: _t->slotDrawButtonPressed(); break;
         case 8: _t->slotButtonGroupSelectionChanged(); break;
         case 9: _t->slotLoadMeshFile(); break;
         default: ;

@@ -68,7 +68,11 @@ CgCube::CgCube(int id) : m_id(id), m_type(Cg::TriangleMesh)
 
         auto centroid = (p_0 + p_1 + p_2) * glm::vec3(1.0 / 3, 1.0 / 3, 1.0 / 3);
         auto normal = glm::normalize(glm::cross(p_1 - p_0, p_2 - p_0));
-        m_triangle_normals.push_back(new CgPolyline(m_id + 100 + i, std::vector<glm::vec3>{centroid, centroid + normal}, glm::vec3(255.0, 80.0, 30.0), 1));
+        m_face_normals.push_back(normal);
+        // m_vertex_normals.push_back(normal);
+        // m_vertex_normals.push_back(normal);
+        // m_vertex_normals.push_back(normal);
+        // m_triangle_normals.push_back(new CgPolyline(m_id + 100 + i, std::vector<glm::vec3>{centroid, centroid + normal}, glm::vec3(255.0, 80.0, 30.0), 1));
     }
 }
 
@@ -79,6 +83,7 @@ CgCube::~CgCube()
     m_vertex_colors.clear();
     m_tex_coords.clear();
     m_triangle_indices.clear();
+    m_triangle_normals.clear();
     m_face_normals.clear();
     m_face_colors.clear();
 }

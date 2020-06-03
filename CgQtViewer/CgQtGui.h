@@ -109,8 +109,8 @@ private slots:
     void slotRGBRedInputChanged(int value);
     void slotRGBGreenInputChanged(int value);
     void slotRGBBlueInputChanged(int value);
-    void slotMyCheckBox1Changed();
-    void slotMyButton1Pressed();
+    void slotShowFaceNormalsChanged(int state);
+    void slotDrawButtonPressed();
     void slotButtonGroupSelectionChanged();
     void slotLoadMeshFile();
 };

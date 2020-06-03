@@ -3,6 +3,7 @@
 
 #include "CgBase/CgObserver.h"
 #include "CgBase/CgBaseSceneControl.h"
+#include "CgBase/CgBaseTriangleMesh.h"
 #include <glm/glm.hpp>
 #include <vector>
 
@@ -16,17 +17,21 @@ class CgSceneControl : public CgObserver, public CgBaseSceneControl
 public:
     CgSceneControl();
     ~CgSceneControl();
+
     void handleEvent(CgBaseEvent *e);
     void setRenderer(CgBaseRenderer *r);
-
     void renderObjects();
+
+    std::vector<CgPolyline *> *buildFaceNormals();
 
 private:
     CgBaseRenderer *m_renderer;
 
     CgCube *m_cube;
-    std::vector<CgPolyline *> m_lines;
-    int m_rgb[3];
+    CgBaseTriangleMesh *m_curr_obj;
+
+    std::vector<CgPolyline *> *m_lines;
+    glm::vec3 m_rgb;
 
     glm::mat4 m_current_transformation;
     glm::mat4 m_trackball_rotation;

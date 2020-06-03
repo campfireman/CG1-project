@@ -26,10 +26,10 @@ namespace Cg
 		LoadObjFileEvent = 0x0000200,
 		CgTrackballEvent = 0x0000400,
 		CgColorChangeEvent = 0x0001000,
+		CgButtonPressedEvent = 0x0002000,
+		CgCheckboxChangedEvent = 0x0004000,
 
 		// unused, may be changed to whatever
-		CgSomeSpecialEvent2 = 0x0002000,
-		CgSomeSpecialEvent3 = 0x0004000,
 		CgSomeSpecialEvent4 = 0x0008000,
 		CgEventGroup1 = 0x000f000,
 
@@ -395,6 +395,16 @@ namespace Cg
 		Green,
 		Blue
 	} Color;
+
+	typedef enum ButtonType
+	{
+		Draw
+	} ButtonType;
+
+	typedef enum CheckboxType
+	{
+		FaceNormals
+	} CheckboxType;
 
 } // namespace Cg
 

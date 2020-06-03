@@ -10,6 +10,8 @@
 #include "../CgEvents/CgLoadObjFileEvent.h"
 #include "../CgEvents/CgTrackballEvent.h"
 #include "../CgEvents/CgColorChangeEvent.h"
+#include "../CgEvents/CgButtonPressedEvent.h"
+#include "../CgEvents/CgCheckboxChangedEvent.h"
 #include <QSlider>
 #include <QVBoxLayout>
 #include <QHBoxLayout>
@@ -149,13 +151,20 @@ void CgQtGui::createOptionPanelExample1(QWidget *parent)
     QPushButton *drawButton = new QPushButton("Draw!");
     tab1_control->addWidget(drawButton);
 
-    connect(drawButton, SIGNAL(clicked()), this, SLOT(slotMyButton1Pressed()));
+    connect(drawButton, SIGNAL(clicked()), this, SLOT(slotDrawButtonPressed()));
 
     /*Example for using a label */
 
-    QLabel *options_label = new QLabel("Options");
+    QLabel *options_label = new QLabel("General Options");
     tab1_control->addWidget(options_label);
     options_label->setAlignment(Qt::AlignCenter);
+
+    /* option for drawing face normals */
+    myCheckBox1 = new QCheckBox("Show face normals");
+    myCheckBox1->setCheckable(true);
+    myCheckBox1->setChecked(false);
+    connect(myCheckBox1, SIGNAL(stateChanged(int)), this, SLOT(slotShowFaceNormalsChanged(int)));
+    tab1_control->addWidget(myCheckBox1);
 
     /* control RGB color scheme */
 
@@ -172,7 +181,7 @@ void CgQtGui::createOptionPanelExample1(QWidget *parent)
     tab1_control->addWidget(RGBGreenInput);
     RGBGreenInput->setMinimum(0);
     RGBGreenInput->setMaximum(255);
-    RGBGreenInput->setValue(0);
+    RGBGreenInput->setValue(255);
     RGBGreenInput->setPrefix("Green:  ");
     connect(RGBGreenInput, SIGNAL(valueChanged(int)), this, SLOT(slotRGBGreenInputChanged(int)));
     tab1_control->addWidget(RGBGreenInput);
@@ -265,8 +274,10 @@ void CgQtGui::slotRGBBlueInputChanged(int value)
     CgBaseEvent *e = new CgColorChangeEvent(Cg::CgColorChangeEvent, Cg::Blue, value);
     notifyObserver(e);
 }
-void CgQtGui::slotMyCheckBox1Changed()
+void CgQtGui::slotShowFaceNormalsChanged(int state)
 {
+    CgBaseEvent *e = new CgCheckboxChangedEvent(Cg::CgCheckboxChangedEvent, Cg::FaceNormals, state);
+    notifyObserver(e);
 }
 
 void CgQtGui::slotLoadMeshFile()
@@ -285,9 +296,11 @@ void CgQtGui::slotTrackballChanged()
     notifyObserver(e);
 }
 
-void CgQtGui::slotMyButton1Pressed()
+void CgQtGui::slotDrawButtonPressed()
 {
-    std::cout << "button 1 pressed " << std::endl;
+    CgBaseEvent *e = new CgButtonPressedEvent(Cg::CgButtonPressedEvent, Cg::Draw);
+    notifyObserver(e);
+    std::cout << "draw button pressed " << std::endl;
 }
 
 void CgQtGui::mouseEvent(QMouseEvent *event)
