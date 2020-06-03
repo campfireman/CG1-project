@@ -28,9 +28,9 @@ namespace Cg
 		CgColorChangeEvent = 0x0001000,
 		CgButtonPressedEvent = 0x0002000,
 		CgCheckboxChangedEvent = 0x0004000,
+		CgSelectionChangedEvent = 0x0008000,
 
 		// unused, may be changed to whatever
-		CgSomeSpecialEvent4 = 0x0008000,
 		CgEventGroup1 = 0x000f000,
 
 		// feel free to add whatever you like
@@ -380,9 +380,9 @@ namespace Cg
 		Polyline = 0x00000002,
 		TriangleMesh = 0x00000004,
 		PolygonalMesh = 0x00000008,
+		Cube = 0x00000020,
+		SolidOfRevolution = 0x00000040,
 		//the following are unused, feel free to change
-		SomeOtherType2 = 0x00000020,
-		SomeOtherType3 = 0x00000040,
 		SomeOtherType4 = 0x00000080,
 		SomeOtherType5 = 0x000000A0,
 		SomeOtherType6 = 0x00000100,
@@ -406,6 +406,10 @@ namespace Cg
 		FaceNormals
 	} CheckboxType;
 
+	typedef enum SelectionType
+	{
+		Object
+	} SelectionType;
 } // namespace Cg
 
 #endif /* CGENUMS_H_ */

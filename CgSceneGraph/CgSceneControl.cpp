@@ -8,6 +8,7 @@
 #include "CgEvents/CgColorChangeEvent.h"
 #include "CgEvents/CgButtonPressedEvent.h"
 #include "CgEvents/CgCheckboxChangedEvent.h"
+#include "CgEvents/CgSelectionChangedEvent.h"
 #include "CgBase/CgBaseRenderer.h"
 #include "CgExampleTriangle.h"
 #include "CgCube.h"
@@ -26,7 +27,7 @@ CgSceneControl::CgSceneControl() : m_rgb(glm::vec3(0.0, 1.0, 0.0))
 
     // objects
     m_cube = new CgCube(42);
-    m_curr_obj = NULL;
+    m_curr_obj = m_cube;
     m_lines = NULL;
 }
 
@@ -167,11 +168,9 @@ void CgSceneControl::handleEvent(CgBaseEvent *e)
         Cg::ButtonType button = ev->getButton();
         if (button == Cg::Draw)
         {
-            m_curr_obj = m_cube;
             m_renderer->redraw();
         }
     }
-    std::cout << e->getType() << std::endl;
     if (e->getType() & Cg::CgCheckboxChangedEvent)
     {
         CgCheckboxChangedEvent *ev = (CgCheckboxChangedEvent *)e;
@@ -186,7 +185,6 @@ void CgSceneControl::handleEvent(CgBaseEvent *e)
             }
             if (state == Qt::Checked)
             {
-                std::cout << "hello" << std::endl;
                 for (auto &line : *m_lines)
                 {
                     std::cout << line << std::endl;
@@ -205,10 +203,26 @@ void CgSceneControl::handleEvent(CgBaseEvent *e)
             }
         }
     }
+
+    if (e->getType() & Cg::CgSelectionChangedEvent)
+    {
+        CgSelectionChangedEvent *ev = (CgSelectionChangedEvent *)e;
+        std::cout << ev->getValue() << std::endl;
+        int object = ev->getValue();
+
+        if (object == Cg::Cube)
+        {
+            m_curr_obj = m_cube;
+        }
+        else
+        {
+            m_curr_obj = NULL;
+        }
+    }
+
     if (e->getType() & Cg::CgColorChangeEvent)
     {
         CgColorChangeEvent *ev = (CgColorChangeEvent *)e;
-        std::cout << ev->getColor() << std::endl;
         m_rgb[ev->getColor()] = ev->getValue() / 255.0;
         std::cout << m_rgb[0] << std::endl;
         std::cout << m_rgb[1] << std::endl;

@@ -12,6 +12,7 @@
 #include "../CgEvents/CgColorChangeEvent.h"
 #include "../CgEvents/CgButtonPressedEvent.h"
 #include "../CgEvents/CgCheckboxChangedEvent.h"
+#include "../CgEvents/CgSelectionChangedEvent.h"
 #include <QSlider>
 #include <QVBoxLayout>
 #include <QHBoxLayout>
@@ -137,8 +138,9 @@ void CgQtGui::createOptionPanelExample1(QWidget *parent)
 
     radiobutton1->setChecked(true);
 
-    myButtonGroup->addButton(radiobutton1, 0);
-    myButtonGroup->addButton(radiobutton2, 1);
+    myButtonGroup->addButton(radiobutton1, Cg::Cube);
+    myButtonGroup->addButton(radiobutton2, Cg::SolidOfRevolution);
+    connect(myButtonGroup, SIGNAL(buttonClicked(int)), this, SLOT(slotObjectSelectionChanged(int)));
 
     QVBoxLayout *vbox = new QVBoxLayout;
     vbox->addWidget(radiobutton1);
@@ -280,6 +282,12 @@ void CgQtGui::slotShowFaceNormalsChanged(int state)
     notifyObserver(e);
 }
 
+void CgQtGui::slotObjectSelectionChanged(int object)
+{
+    std::cout << object << std::endl;
+    CgBaseEvent *e = new CgSelectionChangedEvent(Cg::CgSelectionChangedEvent, Cg::Object, object);
+    notifyObserver(e);
+}
 void CgQtGui::slotLoadMeshFile()
 {
 

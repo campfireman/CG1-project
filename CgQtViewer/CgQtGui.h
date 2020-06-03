@@ -110,6 +110,7 @@ private slots:
     void slotRGBGreenInputChanged(int value);
     void slotRGBBlueInputChanged(int value);
     void slotShowFaceNormalsChanged(int state);
+    void slotObjectSelectionChanged(int object);
     void slotDrawButtonPressed();
     void slotButtonGroupSelectionChanged();
     void slotLoadMeshFile();

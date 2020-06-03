@@ -21,8 +21,8 @@ QT_BEGIN_MOC_NAMESPACE
 QT_WARNING_PUSH
 QT_WARNING_DISABLE_DEPRECATED
 struct qt_meta_stringdata_CgQtGui_t {
-    QByteArrayData data[16];
-    char stringdata0[258];
+    QByteArrayData data[18];
+    char stringdata0[292];
 };
 #define QT_MOC_LITERAL(idx, ofs, len) \
     Q_STATIC_BYTE_ARRAY_DATA_HEADER_INITIALIZER_WITH_OFFSET(len, \
@@ -44,9 +44,11 @@ QT_MOC_LITERAL(9, 105, 24), // "slotRGBGreenInputChanged"
 QT_MOC_LITERAL(10, 130, 23), // "slotRGBBlueInputChanged"
 QT_MOC_LITERAL(11, 154, 26), // "slotShowFaceNormalsChanged"
 QT_MOC_LITERAL(12, 181, 5), // "state"
-QT_MOC_LITERAL(13, 187, 21), // "slotDrawButtonPressed"
-QT_MOC_LITERAL(14, 209, 31), // "slotButtonGroupSelectionChanged"
-QT_MOC_LITERAL(15, 241, 16) // "slotLoadMeshFile"
+QT_MOC_LITERAL(13, 187, 26), // "slotObjectSelectionChanged"
+QT_MOC_LITERAL(14, 214, 6), // "object"
+QT_MOC_LITERAL(15, 221, 21), // "slotDrawButtonPressed"
+QT_MOC_LITERAL(16, 243, 31), // "slotButtonGroupSelectionChanged"
+QT_MOC_LITERAL(17, 275, 16) // "slotLoadMeshFile"
 
     },
     "CgQtGui\0mouseEvent\0\0QMouseEvent*\0event\0"
@@ -55,6 +57,7 @@ QT_MOC_LITERAL(15, 241, 16) // "slotLoadMeshFile"
     "slotRGBGreenInputChanged\0"
     "slotRGBBlueInputChanged\0"
     "slotShowFaceNormalsChanged\0state\0"
+    "slotObjectSelectionChanged\0object\0"
     "slotDrawButtonPressed\0"
     "slotButtonGroupSelectionChanged\0"
     "slotLoadMeshFile"
@@ -67,7 +70,7 @@ static const uint qt_meta_data_CgQtGui[] = {
        8,       // revision
        0,       // classname
        0,    0, // classinfo
-      10,   14, // methods
+      11,   14, // methods
        0,    0, // properties
        0,    0, // enums/sets
        0,    0, // constructors
@@ -75,16 +78,17 @@ static const uint qt_meta_data_CgQtGui[] = {
        0,       // signalCount
 
  // slots: name, argc, parameters, tag, flags
-       1,    1,   64,    2, 0x08 /* Private */,
-       5,    2,   67,    2, 0x08 /* Private */,
-       6,    0,   72,    2, 0x08 /* Private */,
-       7,    1,   73,    2, 0x08 /* Private */,
-       9,    1,   76,    2, 0x08 /* Private */,
-      10,    1,   79,    2, 0x08 /* Private */,
-      11,    1,   82,    2, 0x08 /* Private */,
-      13,    0,   85,    2, 0x08 /* Private */,
-      14,    0,   86,    2, 0x08 /* Private */,
-      15,    0,   87,    2, 0x08 /* Private */,
+       1,    1,   69,    2, 0x08 /* Private */,
+       5,    2,   72,    2, 0x08 /* Private */,
+       6,    0,   77,    2, 0x08 /* Private */,
+       7,    1,   78,    2, 0x08 /* Private */,
+       9,    1,   81,    2, 0x08 /* Private */,
+      10,    1,   84,    2, 0x08 /* Private */,
+      11,    1,   87,    2, 0x08 /* Private */,
+      13,    1,   90,    2, 0x08 /* Private */,
+      15,    0,   93,    2, 0x08 /* Private */,
+      16,    0,   94,    2, 0x08 /* Private */,
+      17,    0,   95,    2, 0x08 /* Private */,
 
  // slots: parameters
     QMetaType::Void, 0x80000000 | 3,    4,
@@ -94,6 +98,7 @@ static const uint qt_meta_data_CgQtGui[] = {
     QMetaType::Void, QMetaType::Int,    8,
     QMetaType::Void, QMetaType::Int,    8,
     QMetaType::Void, QMetaType::Int,   12,
+    QMetaType::Void, QMetaType::Int,   14,
     QMetaType::Void,
     QMetaType::Void,
     QMetaType::Void,
@@ -114,9 +119,10 @@ void CgQtGui::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id, voi
         case 4: _t->slotRGBGreenInputChanged((*reinterpret_cast< int(*)>(_a[1]))); break;
         case 5: _t->slotRGBBlueInputChanged((*reinterpret_cast< int(*)>(_a[1]))); break;
         case 6: _t->slotShowFaceNormalsChanged((*reinterpret_cast< int(*)>(_a[1]))); break;
-        case 7: _t->slotDrawButtonPressed(); break;
-        case 8: _t->slotButtonGroupSelectionChanged(); break;
-        case 9: _t->slotLoadMeshFile(); break;
+        case 7: _t->slotObjectSelectionChanged((*reinterpret_cast< int(*)>(_a[1]))); break;
+        case 8: _t->slotDrawButtonPressed(); break;
+        case 9: _t->slotButtonGroupSelectionChanged(); break;
+        case 10: _t->slotLoadMeshFile(); break;
         default: ;
         }
     }
@@ -153,13 +159,13 @@ int CgQtGui::qt_metacall(QMetaObject::Call _c, int _id, void **_a)
     if (_id < 0)
         return _id;
     if (_c == QMetaObject::InvokeMetaMethod) {
-        if (_id < 10)
+        if (_id < 11)
             qt_static_metacall(this, _c, _id, _a);
-        _id -= 10;
+        _id -= 11;
     } else if (_c == QMetaObject::RegisterMethodArgumentMetaType) {
-        if (_id < 10)
+        if (_id < 11)
             *reinterpret_cast<int*>(_a[0]) = -1;
-        _id -= 10;
+        _id -= 11;
     }
     return _id;
 }

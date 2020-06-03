@@ -21,6 +21,7 @@ SOURCES += main.cpp \
     CgEvents/CgLoadObjFileEvent.cpp \
     CgEvents/CgColorChangeEvent.cpp \
     CgEvents/CgCheckboxChangedEvent.cpp \
+    CgEvents/CgSelectionChangedEvent.cpp \
     CgEvents/CgButtonPressedEvent.cpp \
     CgUtils/ObjLoader.cpp \
     CgEvents/CgTrackballEvent.cpp
@@ -53,6 +54,7 @@ HEADERS += \
     CgEvents/CgColorChangeEvent.h \
     CgEvents/CgButtonPressedEvent.h \
     CgEvents/CgCheckboxChangedEvent.h \
+    CgEvents/CgSelectionChangedEvent.h \
     CgUtils/ObjLoader.h \
     CgBase/CgBaseImage.h \
     CgEvents/CgTrackballEvent.h
