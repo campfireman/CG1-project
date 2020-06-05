@@ -1,5 +1,6 @@
-#ifndef CgCube_H
-#define CgCube_H
+#ifndef CgSolidOfRevolution_H
+#define CgSolidOfRevolution_H
+#define PI 3.14159265
 
 #include <vector>
 #include <glm/glm.hpp>
@@ -7,13 +8,13 @@
 #include "CgBase/CgBaseTriangleMesh.h"
 #include "CgPolyline.h"
 
-class CgCube : public CgBaseTriangleMesh
+class CgSolidOfRevolution : public CgBaseTriangleMesh
 {
 
 public:
-    CgCube(int id);
+    CgSolidOfRevolution(unsigned int id, CgPolyline *contour_plot, int lateral_steps, unsigned int iterations, unsigned int n);
 
-    ~CgCube();
+    ~CgSolidOfRevolution();
 
     //inherited from CgBaseRenderableObject
     Cg::ObjectType getType() const;
@@ -33,6 +34,15 @@ public:
     const std::vector<glm::vec3> &getFaceNormals() const;
     const std::vector<glm::vec3> &getFaceColors() const;
 
+    void setLateralSteps(int value);
+    int getLateralSteps() const;
+
+    unsigned int getIterations() const;
+    unsigned int getN() const;
+
+    void setContourPlot(CgPolyline *contour_plot);
+    CgPolyline *getContourPlot() const;
+
 private:
     std::vector<glm::vec3> m_vertices;
     std::vector<glm::vec3> m_vertex_normals;
@@ -44,11 +54,16 @@ private:
     std::vector<glm::vec3> m_face_normals;
     std::vector<glm::vec3> m_face_colors;
 
+    CgPolyline *m_contour_plot;
+    int m_lateral_steps;
+    unsigned int m_iterations;
+    unsigned int m_n;
+
     const Cg::ObjectType m_type;
     const unsigned int m_id;
 };
 
-inline Cg::ObjectType CgCube::getType() const { return m_type; }
-inline unsigned int CgCube::getID() const { return m_id; }
+inline Cg::ObjectType CgSolidOfRevolution::getType() const { return m_type; }
+inline unsigned int CgSolidOfRevolution::getID() const { return m_id; }
 
-#endif // CgCube_H
+#endif // CgSolidOfRevolution_H

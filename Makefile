@@ -63,6 +63,7 @@ SOURCES       = main.cpp \
 		CgSceneGraph/CgExampleTriangle.cpp \
 		CgSceneGraph/CgCube.cpp \
 		CgSceneGraph/CgPolyline.cpp \
+		CgSceneGraph/CgSolidOfRevolution.cpp \
 		CgQtViewer/CgQtGlBufferObject.cpp \
 		CgQtViewer/CgTrackball.cpp \
 		CgEvents/CgWindowResizeEvent.cpp \
@@ -71,7 +72,9 @@ SOURCES       = main.cpp \
 		CgEvents/CgCheckboxChangedEvent.cpp \
 		CgEvents/CgSelectionChangedEvent.cpp \
 		CgEvents/CgButtonPressedEvent.cpp \
+		CgEvents/CgSORChangedEvent.cpp \
 		CgUtils/ObjLoader.cpp \
+		CgUtils/Utils.cpp \
 		CgEvents/CgTrackballEvent.cpp moc_CgQtGLRenderWidget.cpp \
 		moc_CgQtGui.cpp \
 		moc_CgQtMainApplication.cpp
@@ -86,6 +89,7 @@ OBJECTS       = main.o \
 		CgExampleTriangle.o \
 		CgCube.o \
 		CgPolyline.o \
+		CgSolidOfRevolution.o \
 		CgQtGlBufferObject.o \
 		CgTrackball.o \
 		CgWindowResizeEvent.o \
@@ -94,7 +98,9 @@ OBJECTS       = main.o \
 		CgCheckboxChangedEvent.o \
 		CgSelectionChangedEvent.o \
 		CgButtonPressedEvent.o \
+		CgSORChangedEvent.o \
 		ObjLoader.o \
+		Utils.o \
 		CgTrackballEvent.o \
 		moc_CgQtGLRenderWidget.o \
 		moc_CgQtGui.o \
@@ -189,6 +195,7 @@ DIST          = /usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/spec_pre.prf \
 		CgSceneGraph/CgExampleTriangle.h \
 		CgSceneGraph/CgCube.h \
 		CgSceneGraph/CgPolyline.h \
+		CgSceneGraph/CgSolidOfRevolution.h \
 		CgBase/CgBasePointCloud.h \
 		CgBase/CgBaseTriangleMesh.h \
 		CgBase/CgBasePolygonMesh.h \
@@ -202,7 +209,9 @@ DIST          = /usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/spec_pre.prf \
 		CgEvents/CgButtonPressedEvent.h \
 		CgEvents/CgCheckboxChangedEvent.h \
 		CgEvents/CgSelectionChangedEvent.h \
+		CgEvents/CgSORChangedEvent.h \
 		CgUtils/ObjLoader.h \
+		CgUtils/Utils.h \
 		CgBase/CgBaseImage.h \
 		CgEvents/CgTrackballEvent.h main.cpp \
 		CgQtViewer/CGQtGLRenderWidget.cpp \
@@ -215,6 +224,7 @@ DIST          = /usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/spec_pre.prf \
 		CgSceneGraph/CgExampleTriangle.cpp \
 		CgSceneGraph/CgCube.cpp \
 		CgSceneGraph/CgPolyline.cpp \
+		CgSceneGraph/CgSolidOfRevolution.cpp \
 		CgQtViewer/CgQtGlBufferObject.cpp \
 		CgQtViewer/CgTrackball.cpp \
 		CgEvents/CgWindowResizeEvent.cpp \
@@ -223,7 +233,9 @@ DIST          = /usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/spec_pre.prf \
 		CgEvents/CgCheckboxChangedEvent.cpp \
 		CgEvents/CgSelectionChangedEvent.cpp \
 		CgEvents/CgButtonPressedEvent.cpp \
+		CgEvents/CgSORChangedEvent.cpp \
 		CgUtils/ObjLoader.cpp \
+		CgUtils/Utils.cpp \
 		CgEvents/CgTrackballEvent.cpp
 QMAKE_TARGET  = CgViewer
 DESTDIR       = 
@@ -404,8 +416,8 @@ distdir: FORCE
 	@test -d $(DISTDIR) || mkdir -p $(DISTDIR)
 	$(COPY_FILE) --parents $(DIST) $(DISTDIR)/
 	$(COPY_FILE) --parents /usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/data/dummy.cpp $(DISTDIR)/
-	$(COPY_FILE) --parents CgQtViewer/CgQtGLRenderWidget.h CgQtViewer/CgQtGui.h CgBase/CgObserver.h CgBase/CgObservable.h CgBase/CgBaseEvent.h CgBase/CgEnums.h CgEvents/CgMouseEvent.h CgQtViewer/CgQtMainApplication.h CgSceneGraph/CgSceneControl.h CgEvents/CgKeyEvent.h CgBase/CgBaseRenderer.h CgBase/CgBaseRenderableObject.h CgSceneGraph/CgExampleTriangle.h CgSceneGraph/CgCube.h CgSceneGraph/CgPolyline.h CgBase/CgBasePointCloud.h CgBase/CgBaseTriangleMesh.h CgBase/CgBasePolygonMesh.h CgBase/CgBasePolyline.h CgBase/CgBaseSceneControl.h CgQtViewer/CgQtGlBufferObject.h CgQtViewer/CgTrackball.h CgEvents/CgWindowResizeEvent.h CgEvents/CgLoadObjFileEvent.h CgEvents/CgColorChangeEvent.h CgEvents/CgButtonPressedEvent.h CgEvents/CgCheckboxChangedEvent.h CgEvents/CgSelectionChangedEvent.h CgUtils/ObjLoader.h CgBase/CgBaseImage.h CgEvents/CgTrackballEvent.h $(DISTDIR)/
-	$(COPY_FILE) --parents main.cpp CgQtViewer/CGQtGLRenderWidget.cpp CgQtViewer/CgQtGui.cpp CgBase/CgObservable.cpp CgEvents/CgMouseEvent.cpp CgQtViewer/CgQtMainApplication.cpp CgSceneGraph/CgSceneControl.cpp CgEvents/CgKeyEvent.cpp CgSceneGraph/CgExampleTriangle.cpp CgSceneGraph/CgCube.cpp CgSceneGraph/CgPolyline.cpp CgQtViewer/CgQtGlBufferObject.cpp CgQtViewer/CgTrackball.cpp CgEvents/CgWindowResizeEvent.cpp CgEvents/CgLoadObjFileEvent.cpp CgEvents/CgColorChangeEvent.cpp CgEvents/CgCheckboxChangedEvent.cpp CgEvents/CgSelectionChangedEvent.cpp CgEvents/CgButtonPressedEvent.cpp CgUtils/ObjLoader.cpp CgEvents/CgTrackballEvent.cpp $(DISTDIR)/
+	$(COPY_FILE) --parents CgQtViewer/CgQtGLRenderWidget.h CgQtViewer/CgQtGui.h CgBase/CgObserver.h CgBase/CgObservable.h CgBase/CgBaseEvent.h CgBase/CgEnums.h CgEvents/CgMouseEvent.h CgQtViewer/CgQtMainApplication.h CgSceneGraph/CgSceneControl.h CgEvents/CgKeyEvent.h CgBase/CgBaseRenderer.h CgBase/CgBaseRenderableObject.h CgSceneGraph/CgExampleTriangle.h CgSceneGraph/CgCube.h CgSceneGraph/CgPolyline.h CgSceneGraph/CgSolidOfRevolution.h CgBase/CgBasePointCloud.h CgBase/CgBaseTriangleMesh.h CgBase/CgBasePolygonMesh.h CgBase/CgBasePolyline.h CgBase/CgBaseSceneControl.h CgQtViewer/CgQtGlBufferObject.h CgQtViewer/CgTrackball.h CgEvents/CgWindowResizeEvent.h CgEvents/CgLoadObjFileEvent.h CgEvents/CgColorChangeEvent.h CgEvents/CgButtonPressedEvent.h CgEvents/CgCheckboxChangedEvent.h CgEvents/CgSelectionChangedEvent.h CgEvents/CgSORChangedEvent.h CgUtils/ObjLoader.h CgUtils/Utils.h CgBase/CgBaseImage.h CgEvents/CgTrackballEvent.h $(DISTDIR)/
+	$(COPY_FILE) --parents main.cpp CgQtViewer/CGQtGLRenderWidget.cpp CgQtViewer/CgQtGui.cpp CgBase/CgObservable.cpp CgEvents/CgMouseEvent.cpp CgQtViewer/CgQtMainApplication.cpp CgSceneGraph/CgSceneControl.cpp CgEvents/CgKeyEvent.cpp CgSceneGraph/CgExampleTriangle.cpp CgSceneGraph/CgCube.cpp CgSceneGraph/CgPolyline.cpp CgSceneGraph/CgSolidOfRevolution.cpp CgQtViewer/CgQtGlBufferObject.cpp CgQtViewer/CgTrackball.cpp CgEvents/CgWindowResizeEvent.cpp CgEvents/CgLoadObjFileEvent.cpp CgEvents/CgColorChangeEvent.cpp CgEvents/CgCheckboxChangedEvent.cpp CgEvents/CgSelectionChangedEvent.cpp CgEvents/CgButtonPressedEvent.cpp CgEvents/CgSORChangedEvent.cpp CgUtils/ObjLoader.cpp CgUtils/Utils.cpp CgEvents/CgTrackballEvent.cpp $(DISTDIR)/
 
 
 clean: compiler_clean 
@@ -514,7 +526,8 @@ CgQtGui.o: CgQtViewer/CgQtGui.cpp CgQtViewer/CgQtGLRenderWidget.h \
 		CgEvents/CgColorChangeEvent.h \
 		CgEvents/CgButtonPressedEvent.h \
 		CgEvents/CgCheckboxChangedEvent.h \
-		CgEvents/CgSelectionChangedEvent.h
+		CgEvents/CgSelectionChangedEvent.h \
+		CgEvents/CgSORChangedEvent.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o CgQtGui.o CgQtViewer/CgQtGui.cpp
 
 CgObservable.o: CgBase/CgObservable.cpp CgBase/CgObservable.h \
@@ -554,6 +567,7 @@ CgSceneControl.o: CgSceneGraph/CgSceneControl.cpp CgSceneGraph/CgSceneControl.h 
 		CgSceneGraph/CgCube.h \
 		CgSceneGraph/CgPolyline.h \
 		CgBase/CgBasePolyline.h \
+		CgSceneGraph/CgSolidOfRevolution.h \
 		CgUtils/ObjLoader.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o CgSceneControl.o CgSceneGraph/CgSceneControl.cpp
 
@@ -575,7 +589,8 @@ CgCube.o: CgSceneGraph/CgCube.cpp CgSceneGraph/CgCube.h \
 		CgBase/CgEnums.h \
 		CgSceneGraph/CgPolyline.h \
 		CgBase/CgBasePolyline.h \
-		CgUtils/ObjLoader.h
+		CgUtils/ObjLoader.h \
+		CgUtils/Utils.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o CgCube.o CgSceneGraph/CgCube.cpp
 
 CgPolyline.o: CgSceneGraph/CgPolyline.cpp CgSceneGraph/CgPolyline.h \
@@ -583,6 +598,16 @@ CgPolyline.o: CgSceneGraph/CgPolyline.cpp CgSceneGraph/CgPolyline.h \
 		CgBase/CgBaseRenderableObject.h \
 		CgBase/CgEnums.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o CgPolyline.o CgSceneGraph/CgPolyline.cpp
+
+CgSolidOfRevolution.o: CgSceneGraph/CgSolidOfRevolution.cpp CgSceneGraph/CgSolidOfRevolution.h \
+		CgBase/CgBaseTriangleMesh.h \
+		CgBase/CgBaseRenderableObject.h \
+		CgBase/CgEnums.h \
+		CgSceneGraph/CgPolyline.h \
+		CgBase/CgBasePolyline.h \
+		CgUtils/ObjLoader.h \
+		CgUtils/Utils.h
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o CgSolidOfRevolution.o CgSceneGraph/CgSolidOfRevolution.cpp
 
 CgQtGlBufferObject.o: CgQtViewer/CgQtGlBufferObject.cpp CgQtViewer/CgQtGlBufferObject.h \
 		CgBase/CgBasePolyline.h \
@@ -626,8 +651,21 @@ CgButtonPressedEvent.o: CgEvents/CgButtonPressedEvent.cpp CgEvents/CgButtonPress
 		CgBase/CgEnums.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o CgButtonPressedEvent.o CgEvents/CgButtonPressedEvent.cpp
 
+CgSORChangedEvent.o: CgEvents/CgSORChangedEvent.cpp CgEvents/CgSORChangedEvent.h \
+		CgBase/CgBaseEvent.h \
+		CgBase/CgEnums.h
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o CgSORChangedEvent.o CgEvents/CgSORChangedEvent.cpp
+
 ObjLoader.o: CgUtils/ObjLoader.cpp CgUtils/ObjLoader.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o ObjLoader.o CgUtils/ObjLoader.cpp
+
+Utils.o: CgUtils/Utils.cpp CgUtils/Utils.h \
+		CgBase/CgBaseTriangleMesh.h \
+		CgBase/CgBaseRenderableObject.h \
+		CgBase/CgEnums.h \
+		CgSceneGraph/CgPolyline.h \
+		CgBase/CgBasePolyline.h
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o Utils.o CgUtils/Utils.cpp
 
 CgTrackballEvent.o: CgEvents/CgTrackballEvent.cpp CgEvents/CgTrackballEvent.h \
 		CgBase/CgBaseEvent.h \

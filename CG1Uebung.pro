@@ -15,6 +15,7 @@ SOURCES += main.cpp \
     CgSceneGraph/CgExampleTriangle.cpp \
     CgSceneGraph/CgCube.cpp \
     CgSceneGraph/CgPolyline.cpp \
+    CgSceneGraph/CgSolidOfRevolution.cpp \
     CgQtViewer/CgQtGlBufferObject.cpp \
     CgQtViewer/CgTrackball.cpp \
     CgEvents/CgWindowResizeEvent.cpp \
@@ -23,7 +24,9 @@ SOURCES += main.cpp \
     CgEvents/CgCheckboxChangedEvent.cpp \
     CgEvents/CgSelectionChangedEvent.cpp \
     CgEvents/CgButtonPressedEvent.cpp \
+    CgEvents/CgSORChangedEvent.cpp \
     CgUtils/ObjLoader.cpp \
+    CgUtils/Utils.cpp \
     CgEvents/CgTrackballEvent.cpp
 
 HEADERS += \
@@ -42,6 +45,7 @@ HEADERS += \
     CgSceneGraph/CgExampleTriangle.h \
     CgSceneGraph/CgCube.h \
     CgSceneGraph/CgPolyline.h \
+    CgSceneGraph/CgSolidOfRevolution.h \
     CgBase/CgBasePointCloud.h \
     CgBase/CgBaseTriangleMesh.h \
     CgBase/CgBasePolygonMesh.h \
@@ -55,7 +59,9 @@ HEADERS += \
     CgEvents/CgButtonPressedEvent.h \
     CgEvents/CgCheckboxChangedEvent.h \
     CgEvents/CgSelectionChangedEvent.h \
+    CgEvents/CgSORChangedEvent.h \
     CgUtils/ObjLoader.h \
+    CgUtils/Utils.h \
     CgBase/CgBaseImage.h \
     CgEvents/CgTrackballEvent.h
 

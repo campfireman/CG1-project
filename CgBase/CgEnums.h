@@ -29,9 +29,9 @@ namespace Cg
 		CgButtonPressedEvent = 0x0002000,
 		CgCheckboxChangedEvent = 0x0004000,
 		CgSelectionChangedEvent = 0x0008000,
+		CgSORChangedEvent = 0x000f000,
 
 		// unused, may be changed to whatever
-		CgEventGroup1 = 0x000f000,
 
 		// feel free to add whatever you like
 	} EventType;
@@ -410,6 +410,12 @@ namespace Cg
 	{
 		Object
 	} SelectionType;
+	typedef enum SOROptionType
+	{
+		LateralSteps,
+		Iterations,
+		N,
+	} SOROptionType;
 } // namespace Cg
 
 #endif /* CGENUMS_H_ */

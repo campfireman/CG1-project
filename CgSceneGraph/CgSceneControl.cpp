@@ -9,24 +9,37 @@
 #include "CgEvents/CgButtonPressedEvent.h"
 #include "CgEvents/CgCheckboxChangedEvent.h"
 #include "CgEvents/CgSelectionChangedEvent.h"
+#include "CgEvents/CgSORChangedEvent.h"
 #include "CgBase/CgBaseRenderer.h"
 #include "CgExampleTriangle.h"
 #include "CgCube.h"
+#include "CgSolidOfRevolution.h"
 #include <iostream>
 #include <glm/gtc/matrix_transform.hpp>
 #include "CgUtils/ObjLoader.h"
+#include "CgUtils/Utils.h"
 #include <string>
 #include <Qt>
+
+unsigned int CgSceneControl::idCounter = 100;
 
 CgSceneControl::CgSceneControl() : m_rgb(glm::vec3(0.0, 1.0, 0.0))
 {
     m_current_transformation = glm::mat4(1.);
-    m_lookAt_matrix = glm::lookAt(glm::vec3(0.0, 0.0, 3.0), glm::vec3(0.0, 0.0, 0.0), glm::vec3(0.0, 1.0, 0.0));
+    m_lookAt_matrix = glm::lookAt(glm::vec3(0.0, 0.0, 5.0), glm::vec3(0.0, 0.0, 0.0), glm::vec3(0.0, 1.0, 0.0));
     m_proj_matrix = glm::mat4x4(glm::vec4(1.792591, 0.0, 0.0, 0.0), glm::vec4(0.0, 1.792591, 0.0, 0.0), glm::vec4(0.0, 0.0, -1.0002, -1.0), glm::vec4(0.0, 0.0, -0.020002, 0.0));
     m_trackball_rotation = glm::mat4(1.);
 
     // objects
-    m_cube = new CgCube(42);
+    m_cube = new CgCube(idCounter++);
+    m_solid_of_revolution = new CgSolidOfRevolution(
+        idCounter++,
+        new CgPolyline(idCounter++,
+                       std::vector<glm::vec3>{glm::vec3(0.0, 0.0, 0.0), glm::vec3(1.0, 0.0, 0.0), glm::vec3(2.0, 1.0, 0.0), glm::vec3(1.0, 2.0, 0.0), glm::vec3(0.0, 2.0, 0.0)}, glm::vec3(0.0, 1.0, 0.0), 1),
+        20,
+        0,
+        2);
+    // m_solid_of_revolution = NULL;
     m_curr_obj = m_cube;
     m_lines = NULL;
 }
@@ -45,7 +58,14 @@ void CgSceneControl::setRenderer(CgBaseRenderer *r)
     m_renderer->setSceneControl(this);
     m_renderer->setUniformValue("mycolor", glm::vec4(0.0, 1.0, 0.0, 1.0));
 
-    m_renderer->init(m_cube);
+    if (m_cube != NULL)
+    {
+        m_renderer->init(m_cube);
+    }
+    if (m_solid_of_revolution != NULL)
+    {
+        m_renderer->init(m_solid_of_revolution);
+    }
 }
 
 void CgSceneControl::renderObjects()
@@ -75,7 +95,6 @@ void CgSceneControl::renderObjects()
     {
         for (auto &line : *m_lines)
         {
-            std::cout << "h111" << std::endl;
             m_renderer->render(line);
         }
     }
@@ -162,8 +181,9 @@ void CgSceneControl::handleEvent(CgBaseEvent *e)
     }
 
     // custom handlers
-    if (e->getType() & Cg::CgButtonPressedEvent)
+    if (e->getType() == Cg::CgButtonPressedEvent)
     {
+        std::cout << "Button Pressed Event" << std::endl;
         CgButtonPressedEvent *ev = (CgButtonPressedEvent *)e;
         Cg::ButtonType button = ev->getButton();
         if (button == Cg::Draw)
@@ -171,8 +191,9 @@ void CgSceneControl::handleEvent(CgBaseEvent *e)
             m_renderer->redraw();
         }
     }
-    if (e->getType() & Cg::CgCheckboxChangedEvent)
+    if (e->getType() == Cg::CgCheckboxChangedEvent)
     {
+        std::cout << "Checkbox Changed Event" << std::endl;
         CgCheckboxChangedEvent *ev = (CgCheckboxChangedEvent *)e;
         Cg::CheckboxType checkbox = ev->getCheckbox();
         int state = ev->getState();
@@ -190,7 +211,6 @@ void CgSceneControl::handleEvent(CgBaseEvent *e)
                     std::cout << line << std::endl;
                     m_renderer->init(line);
                 }
-                m_renderer->redraw();
             }
             else if (state == Qt::Unchecked)
             {
@@ -198,21 +218,25 @@ void CgSceneControl::handleEvent(CgBaseEvent *e)
                 {
                     delete m_lines;
                     m_lines = NULL;
-                    m_renderer->redraw();
                 }
             }
         }
     }
 
-    if (e->getType() & Cg::CgSelectionChangedEvent)
+    if (e->getType() == Cg::CgSelectionChangedEvent)
     {
+        std::cout << "Selection Changed Event" << std::endl;
         CgSelectionChangedEvent *ev = (CgSelectionChangedEvent *)e;
-        std::cout << ev->getValue() << std::endl;
         int object = ev->getValue();
+        std::cout << ev->getValue() << std::endl;
 
         if (object == Cg::Cube)
         {
             m_curr_obj = m_cube;
+        }
+        else if (object == Cg::SolidOfRevolution)
+        {
+            m_curr_obj = m_solid_of_revolution;
         }
         else
         {
@@ -220,15 +244,60 @@ void CgSceneControl::handleEvent(CgBaseEvent *e)
         }
     }
 
-    if (e->getType() & Cg::CgColorChangeEvent)
+    if (e->getType() == Cg::CgSORChangedEvent)
     {
+        std::cout << "SOR Changed Event" << std::endl;
+        CgSORChangedEvent *ev = (CgSORChangedEvent *)e;
+        Cg::SOROptionType option = ev->getOption();
+        int value = ev->getValue();
+        std::cout << ev->getValue() << std::endl;
+        CgSolidOfRevolution *old_obj = m_solid_of_revolution;
+        CgSolidOfRevolution *new_obj = NULL;
+        if (option == Cg::LateralSteps)
+        {
+            new_obj = new CgSolidOfRevolution(
+                idCounter++,
+                old_obj->getContourPlot(),
+                value,
+                old_obj->getIterations(),
+                old_obj->getN());
+        }
+        else if (option == Cg::Iterations)
+        {
+            new_obj = new CgSolidOfRevolution(
+                idCounter++,
+                old_obj->getContourPlot(),
+                old_obj->getLateralSteps(),
+                value,
+                old_obj->getN());
+        }
+        else if (option == Cg::N)
+        {
+            new_obj = new CgSolidOfRevolution(
+                idCounter++,
+                old_obj->getContourPlot(),
+                old_obj->getLateralSteps(),
+                old_obj->getIterations(),
+                value);
+        }
+        if (new_obj != NULL)
+        {
+            if (m_curr_obj == old_obj)
+            {
+                m_curr_obj = new_obj;
+            }
+            m_solid_of_revolution = new_obj;
+            m_renderer->init(new_obj);
+            // delete old_obj;
+        }
+    }
+    if (e->getType() == Cg::CgColorChangeEvent)
+    {
+        std::cout << "Color changed event" << std::endl;
         CgColorChangeEvent *ev = (CgColorChangeEvent *)e;
+        std::cout << ev->getValue() << std::endl;
         m_rgb[ev->getColor()] = ev->getValue() / 255.0;
-        std::cout << m_rgb[0] << std::endl;
-        std::cout << m_rgb[1] << std::endl;
-        std::cout << m_rgb[2] << std::endl;
         m_renderer->setUniformValue("mycolor", glm::vec4(m_rgb[0], m_rgb[1], m_rgb[2], 1.0));
-        m_renderer->redraw();
     }
     // an der Stelle an der ein Event abgearbeitet ist wird es auch gelöscht.
     delete e;
@@ -251,7 +320,7 @@ std::vector<CgPolyline *> *CgSceneControl::buildFaceNormals()
 
             auto centroid = (p_0 + p_1 + p_2) * glm::vec3(1.0 / 3, 1.0 / 3, 1.0 / 3);
             auto normal = normals[i / 3];
-            triangle_normals->push_back(new CgPolyline(100 + i, std::vector<glm::vec3>{centroid, centroid + normal}, glm::vec3(255.0, 80.0, 30.0), 1));
+            triangle_normals->push_back(new CgPolyline(idCounter++, std::vector<glm::vec3>{centroid, centroid + normal}, glm::vec3(255.0, 80.0, 30.0), 1));
         }
         return triangle_normals;
     }

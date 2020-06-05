@@ -109,6 +109,9 @@ private slots:
     void slotRGBRedInputChanged(int value);
     void slotRGBGreenInputChanged(int value);
     void slotRGBBlueInputChanged(int value);
+    void slotLateralStepsChanged(int value);
+    void slotIterationsChanged(int value);
+    void slotNChanged(int value);
     void slotShowFaceNormalsChanged(int state);
     void slotObjectSelectionChanged(int object);
     void slotDrawButtonPressed();

@@ -10,6 +10,7 @@
 class CgBaseEvent;
 class CgBaseRenderer;
 class CgCube;
+class CgSolidOfRevolution;
 class CgPolyline;
 
 class CgSceneControl : public CgObserver, public CgBaseSceneControl
@@ -24,10 +25,13 @@ public:
 
     std::vector<CgPolyline *> *buildFaceNormals();
 
+    static unsigned int idCounter;
+
 private:
     CgBaseRenderer *m_renderer;
 
     CgCube *m_cube;
+    CgSolidOfRevolution *m_solid_of_revolution;
     CgBaseTriangleMesh *m_curr_obj;
 
     std::vector<CgPolyline *> *m_lines;

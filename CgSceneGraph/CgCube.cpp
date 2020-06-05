@@ -1,6 +1,7 @@
 #include "CgCube.h"
 #include "CgBase/CgEnums.h"
 #include "CgUtils/ObjLoader.h"
+#include "CgUtils/Utils.h"
 
 CgCube::CgCube(int id) : m_id(id), m_type(Cg::TriangleMesh)
 {
@@ -60,20 +61,7 @@ CgCube::CgCube(int id) : m_id(id), m_type(Cg::TriangleMesh)
     m_triangle_indices.push_back(2);
     m_triangle_indices.push_back(3);
 
-    for (int i = 0; i < m_triangle_indices.size(); i += 3)
-    {
-        auto p_0 = m_vertices[m_triangle_indices[i]];
-        auto p_1 = m_vertices[m_triangle_indices[i + 1]];
-        auto p_2 = m_vertices[m_triangle_indices[i + 2]];
-
-        auto centroid = (p_0 + p_1 + p_2) * glm::vec3(1.0 / 3, 1.0 / 3, 1.0 / 3);
-        auto normal = glm::normalize(glm::cross(p_1 - p_0, p_2 - p_0));
-        m_face_normals.push_back(normal);
-        // m_vertex_normals.push_back(normal);
-        // m_vertex_normals.push_back(normal);
-        // m_vertex_normals.push_back(normal);
-        // m_triangle_normals.push_back(new CgPolyline(m_id + 100 + i, std::vector<glm::vec3>{centroid, centroid + normal}, glm::vec3(255.0, 80.0, 30.0), 1));
-    }
+    Utils::createFaceNormals(m_vertices, m_triangle_indices, m_face_normals);
 }
 
 CgCube::~CgCube()
@@ -83,7 +71,6 @@ CgCube::~CgCube()
     m_vertex_colors.clear();
     m_tex_coords.clear();
     m_triangle_indices.clear();
-    m_triangle_normals.clear();
     m_face_normals.clear();
     m_face_colors.clear();
 }
@@ -135,11 +122,6 @@ const std::vector<glm::vec2> &CgCube::getVertexTexCoords() const
 const std::vector<unsigned int> &CgCube::getTriangleIndices() const
 {
     return m_triangle_indices;
-}
-
-const std::vector<CgPolyline *> &CgCube::getTriangleNormals() const
-{
-    return m_triangle_normals;
 }
 
 const std::vector<glm::vec3> &CgCube::getFaceNormals() const

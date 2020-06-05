@@ -13,6 +13,7 @@
 #include "../CgEvents/CgButtonPressedEvent.h"
 #include "../CgEvents/CgCheckboxChangedEvent.h"
 #include "../CgEvents/CgSelectionChangedEvent.h"
+#include "../CgEvents/CgSORChangedEvent.h"
 #include <QSlider>
 #include <QVBoxLayout>
 #include <QHBoxLayout>
@@ -134,7 +135,7 @@ void CgQtGui::createOptionPanelExample1(QWidget *parent)
     myButtonGroup->setExclusive(true);
 
     QRadioButton *radiobutton1 = new QRadioButton("Cube");
-    QRadioButton *radiobutton2 = new QRadioButton("Rotation Body");
+    QRadioButton *radiobutton2 = new QRadioButton("Solid of revolution");
 
     radiobutton1->setChecked(true);
 
@@ -150,12 +151,35 @@ void CgQtGui::createOptionPanelExample1(QWidget *parent)
     subBox->addWidget(myGroupBox);
     tab1_control->addLayout(subBox);
 
-    QPushButton *drawButton = new QPushButton("Draw!");
-    tab1_control->addWidget(drawButton);
-
-    connect(drawButton, SIGNAL(clicked()), this, SLOT(slotDrawButtonPressed()));
-
     /*Example for using a label */
+    QLabel *sor_options_label = new QLabel("Solid of revolution options");
+    tab1_control->addWidget(sor_options_label);
+    sor_options_label->setAlignment(Qt::AlignCenter);
+
+    auto LateralStepsInput = new QSpinBox();
+    tab1_control->addWidget(LateralStepsInput);
+    LateralStepsInput->setMinimum(10);
+    LateralStepsInput->setValue(20);
+    LateralStepsInput->setMaximum(100000);
+    LateralStepsInput->setPrefix("Lateral steps:  ");
+    connect(LateralStepsInput, SIGNAL(valueChanged(int)), this, SLOT(slotLateralStepsChanged(int)));
+    tab1_control->addWidget(LateralStepsInput);
+
+    auto IterationsInput = new QSpinBox();
+    tab1_control->addWidget(IterationsInput);
+    IterationsInput->setMinimum(0);
+    IterationsInput->setValue(0);
+    IterationsInput->setPrefix("Iterations:  ");
+    connect(IterationsInput, SIGNAL(valueChanged(int)), this, SLOT(slotIterationsChanged(int)));
+    tab1_control->addWidget(IterationsInput);
+
+    auto NInput = new QSpinBox();
+    tab1_control->addWidget(NInput);
+    NInput->setMinimum(1);
+    NInput->setValue(2);
+    NInput->setPrefix("N:  ");
+    connect(NInput, SIGNAL(valueChanged(int)), this, SLOT(slotNChanged(int)));
+    tab1_control->addWidget(NInput);
 
     QLabel *options_label = new QLabel("General Options");
     tab1_control->addWidget(options_label);
@@ -196,6 +220,11 @@ void CgQtGui::createOptionPanelExample1(QWidget *parent)
     RGBBlueInput->setPrefix("Blue:  ");
     connect(RGBBlueInput, SIGNAL(valueChanged(int)), this, SLOT(slotRGBBlueInputChanged(int)));
     tab1_control->addWidget(RGBBlueInput);
+
+    QPushButton *drawButton = new QPushButton("Draw!");
+    tab1_control->addWidget(drawButton);
+
+    connect(drawButton, SIGNAL(clicked()), this, SLOT(slotDrawButtonPressed()));
     /*Example for using a checkbox */
 
     // myCheckBox1 = new QCheckBox("enable Option 1");
@@ -276,6 +305,21 @@ void CgQtGui::slotRGBBlueInputChanged(int value)
     CgBaseEvent *e = new CgColorChangeEvent(Cg::CgColorChangeEvent, Cg::Blue, value);
     notifyObserver(e);
 }
+void CgQtGui::slotLateralStepsChanged(int value)
+{
+    CgBaseEvent *e = new CgSORChangedEvent(Cg::CgSORChangedEvent, Cg::LateralSteps, value);
+    notifyObserver(e);
+}
+void CgQtGui::slotIterationsChanged(int value)
+{
+    CgBaseEvent *e = new CgSORChangedEvent(Cg::CgSORChangedEvent, Cg::Iterations, value);
+    notifyObserver(e);
+}
+void CgQtGui::slotNChanged(int value)
+{
+    CgBaseEvent *e = new CgSORChangedEvent(Cg::CgSORChangedEvent, Cg::N, value);
+    notifyObserver(e);
+}
 void CgQtGui::slotShowFaceNormalsChanged(int state)
 {
     CgBaseEvent *e = new CgCheckboxChangedEvent(Cg::CgCheckboxChangedEvent, Cg::FaceNormals, state);
@@ -284,7 +328,6 @@ void CgQtGui::slotShowFaceNormalsChanged(int state)
 
 void CgQtGui::slotObjectSelectionChanged(int object)
 {
-    std::cout << object << std::endl;
     CgBaseEvent *e = new CgSelectionChangedEvent(Cg::CgSelectionChangedEvent, Cg::Object, object);
     notifyObserver(e);
 }
@@ -308,7 +351,6 @@ void CgQtGui::slotDrawButtonPressed()
 {
     CgBaseEvent *e = new CgButtonPressedEvent(Cg::CgButtonPressedEvent, Cg::Draw);
     notifyObserver(e);
-    std::cout << "draw button pressed " << std::endl;
 }
 
 void CgQtGui::mouseEvent(QMouseEvent *event)
