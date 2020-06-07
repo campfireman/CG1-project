@@ -43,7 +43,7 @@ CgSolidOfRevolution::CgSolidOfRevolution(unsigned int id, CgPolyline *contour_pl
             m_triangle_indices.push_back(j - 1);
         }
     }
-    Utils::createFaceNormals(m_vertices, m_triangle_indices, m_face_normals);
+    Utils::createNormals(m_vertices, m_triangle_indices, m_face_normals, m_vertex_normals);
 }
 
 CgSolidOfRevolution::~CgSolidOfRevolution()

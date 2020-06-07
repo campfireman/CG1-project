@@ -61,7 +61,7 @@ CgCube::CgCube(int id) : m_id(id), m_type(Cg::TriangleMesh)
     m_triangle_indices.push_back(2);
     m_triangle_indices.push_back(3);
 
-    Utils::createFaceNormals(m_vertices, m_triangle_indices, m_face_normals);
+    Utils::createNormals(m_vertices, m_triangle_indices, m_face_normals, m_vertex_normals);
 }
 
 CgCube::~CgCube()

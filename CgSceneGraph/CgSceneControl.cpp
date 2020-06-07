@@ -190,6 +190,11 @@ void CgSceneControl::handleEvent(CgBaseEvent *e)
         Cg::ButtonType button = ev->getButton();
         if (button == Cg::Draw)
         {
+            if (m_lines != NULL)
+            {
+                delete m_lines;
+                m_lines = buildFaceNormals();
+            }
             m_renderer->redraw();
         }
     }
@@ -201,18 +206,9 @@ void CgSceneControl::handleEvent(CgBaseEvent *e)
         int state = ev->getState();
         if (checkbox == Cg::FaceNormals)
         {
-            m_lines = buildFaceNormals();
-            if (m_lines == NULL)
-            {
-                return;
-            }
             if (state == Qt::Checked)
             {
-                for (auto &line : *m_lines)
-                {
-                    std::cout << line << std::endl;
-                    m_renderer->init(line);
-                }
+                m_lines = buildFaceNormals();
             }
             else if (state == Qt::Unchecked)
             {
@@ -326,7 +322,9 @@ std::vector<CgPolyline *> *CgSceneControl::buildFaceNormals()
 
             auto centroid = (p_0 + p_1 + p_2) * glm::vec3(1.0 / 3, 1.0 / 3, 1.0 / 3);
             auto normal = normals[i / 3];
-            triangle_normals->push_back(new CgPolyline(idCounter++, std::vector<glm::vec3>{centroid, centroid + normal}, glm::vec3(255.0, 80.0, 30.0), 1));
+            auto line = new CgPolyline(idCounter++, std::vector<glm::vec3>{centroid, centroid + normal}, glm::vec3(255.0, 80.0, 30.0), 1);
+            m_renderer->init(line);
+            triangle_normals->push_back(line);
         }
         return triangle_normals;
     }

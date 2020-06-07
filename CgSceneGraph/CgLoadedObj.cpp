@@ -5,7 +5,6 @@
 
 CgLoadedObj::CgLoadedObj(int id) : m_id(id), m_type(Cg::TriangleMesh)
 {
-    Utils::createFaceNormals(m_vertices, m_triangle_indices, m_face_normals);
 }
 
 CgLoadedObj::~CgLoadedObj()
@@ -27,7 +26,7 @@ void CgLoadedObj::init(std::vector<glm::vec3> arg_verts, std::vector<glm::vec3> 
     m_vertices = arg_verts;
     m_vertex_normals = arg_normals;
     m_triangle_indices = arg_triangle_indices;
-    Utils::createFaceNormals(m_vertices, m_triangle_indices, m_face_normals);
+    Utils::createNormals(m_vertices, m_triangle_indices, m_face_normals, m_vertex_normals);
 }
 
 void CgLoadedObj::init(std::string filename)

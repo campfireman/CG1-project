@@ -1,7 +1,12 @@
 #include "Utils.h"
 #include <iostream>
-void Utils::createFaceNormals(std::vector<glm::vec3> &vertices, std::vector<unsigned int> &triangle_indices, std::vector<glm::vec3> &face_normals)
+#include <numeric>
+#include <glm/gtx/string_cast.hpp>
+
+void Utils::createNormals(std::vector<glm::vec3> &vertices, std::vector<unsigned int> &triangle_indices, std::vector<glm::vec3> &face_normals, std::vector<glm::vec3> &vertex_normals)
 {
+    std::vector<std::vector<glm::vec3>> vertex_normals_raw{};
+    vertex_normals_raw.resize(vertices.size());
     for (int i = 0; i < triangle_indices.size(); i += 3)
     {
         auto p_0 = vertices[triangle_indices[i]];
@@ -10,6 +15,22 @@ void Utils::createFaceNormals(std::vector<glm::vec3> &vertices, std::vector<unsi
 
         auto normal = glm::normalize(glm::cross(p_1 - p_0, p_2 - p_0));
         face_normals.push_back(normal);
+
+        vertex_normals_raw[triangle_indices[i]].push_back(normal);
+        vertex_normals_raw[triangle_indices[i + 1]].push_back(normal);
+        vertex_normals_raw[triangle_indices[i + 2]].push_back(normal);
+    }
+
+    for (std::vector<glm::vec3> &normals : vertex_normals_raw)
+    {
+        auto sum_of_elems = glm::vec3(0.0, 0.0, 0.0);
+        for (auto &p : normals)
+        {
+            sum_of_elems += p;
+        }
+        auto vertex_normal = sum_of_elems * glm::vec3(1.0 / normals.size(), 1.0 / normals.size(), 1.0 / normals.size());
+        vertex_normals.push_back(vertex_normal);
+        std::cout << glm::to_string(vertex_normal) << std::endl;
     }
 }
 
@@ -17,7 +38,6 @@ std::vector<glm::vec3> Utils::laneRiesenfeld(std::vector<glm::vec3> line, unsign
 {
     for (int i = 0; i < iterations; i++)
     {
-        std::cout << i << " < " << iterations << std::endl;
         int old_size = line.size();
         line.resize(line.size() * 2);
         for (int j = 0; j < old_size; j++)
