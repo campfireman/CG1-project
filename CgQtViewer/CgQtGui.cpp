@@ -136,16 +136,19 @@ void CgQtGui::createOptionPanelExample1(QWidget *parent)
 
     QRadioButton *radiobutton1 = new QRadioButton("Cube");
     QRadioButton *radiobutton2 = new QRadioButton("Solid of revolution");
+    QRadioButton *radiobutton3 = new QRadioButton("Loaded Object");
 
     radiobutton1->setChecked(true);
 
     myButtonGroup->addButton(radiobutton1, Cg::Cube);
     myButtonGroup->addButton(radiobutton2, Cg::SolidOfRevolution);
+    myButtonGroup->addButton(radiobutton3, Cg::LoadedObj);
     connect(myButtonGroup, SIGNAL(buttonClicked(int)), this, SLOT(slotObjectSelectionChanged(int)));
 
     QVBoxLayout *vbox = new QVBoxLayout;
     vbox->addWidget(radiobutton1);
     vbox->addWidget(radiobutton2);
+    vbox->addWidget(radiobutton3);
     vbox->addStretch(1);
     myGroupBox->setLayout(vbox);
     subBox->addWidget(myGroupBox);

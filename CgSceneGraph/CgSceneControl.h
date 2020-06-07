@@ -12,6 +12,7 @@ class CgBaseRenderer;
 class CgCube;
 class CgSolidOfRevolution;
 class CgPolyline;
+class CgLoadedObj;
 
 class CgSceneControl : public CgObserver, public CgBaseSceneControl
 {
@@ -33,6 +34,7 @@ private:
     CgCube *m_cube;
     CgSolidOfRevolution *m_solid_of_revolution;
     CgBaseTriangleMesh *m_curr_obj;
+    CgLoadedObj *m_loaded_obj;
 
     std::vector<CgPolyline *> *m_lines;
     glm::vec3 m_rgb;

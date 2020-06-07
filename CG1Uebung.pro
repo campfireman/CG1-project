@@ -16,6 +16,7 @@ SOURCES += main.cpp \
     CgSceneGraph/CgCube.cpp \
     CgSceneGraph/CgPolyline.cpp \
     CgSceneGraph/CgSolidOfRevolution.cpp \
+    CgSceneGraph/CgLoadedObj.cpp \
     CgQtViewer/CgQtGlBufferObject.cpp \
     CgQtViewer/CgTrackball.cpp \
     CgEvents/CgWindowResizeEvent.cpp \
@@ -46,6 +47,7 @@ HEADERS += \
     CgSceneGraph/CgCube.h \
     CgSceneGraph/CgPolyline.h \
     CgSceneGraph/CgSolidOfRevolution.h \
+    CgSceneGraph/CgLoadedObj.h \
     CgBase/CgBasePointCloud.h \
     CgBase/CgBaseTriangleMesh.h \
     CgBase/CgBasePolygonMesh.h \

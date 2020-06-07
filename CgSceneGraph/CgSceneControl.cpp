@@ -14,6 +14,7 @@
 #include "CgExampleTriangle.h"
 #include "CgCube.h"
 #include "CgSolidOfRevolution.h"
+#include "CgLoadedObj.h"
 #include <iostream>
 #include <glm/gtc/matrix_transform.hpp>
 #include "CgUtils/ObjLoader.h"
@@ -35,12 +36,13 @@ CgSceneControl::CgSceneControl() : m_rgb(glm::vec3(0.0, 1.0, 0.0))
     m_solid_of_revolution = new CgSolidOfRevolution(
         idCounter++,
         new CgPolyline(idCounter++,
-                       std::vector<glm::vec3>{glm::vec3(0.0, 0.0, 0.0), glm::vec3(1.0, 0.0, 0.0), glm::vec3(2.0, 1.0, 0.0), glm::vec3(1.0, 2.0, 0.0), glm::vec3(0.0, 2.0, 0.0)}, glm::vec3(0.0, 1.0, 0.0), 1),
+                       std::vector<glm::vec3>{glm::vec3(0.0, -2.0, 0.0), glm::vec3(1.0, -1.0, 0.0), glm::vec3(0.0, 0.0, 0.0), glm::vec3(0.0, 2.0, 0.0), glm::vec3(3.0, 3.0, 0.0)}, glm::vec3(0.0, 1.0, 0.0), 1),
         20,
         0,
         2);
     // m_solid_of_revolution = NULL;
     m_curr_obj = m_cube;
+    m_loaded_obj = new CgLoadedObj(idCounter++);
     m_lines = NULL;
 }
 
@@ -156,7 +158,7 @@ void CgSceneControl::handleEvent(CgBaseEvent *e)
         m_proj_matrix = glm::perspective(45.0f, (float)(ev->w()) / ev->h(), 0.01f, 100.0f);
     }
 
-    if (e->getType() & Cg::LoadObjFileEvent)
+    if (e->getType() == Cg::LoadObjFileEvent)
     {
 
         CgLoadObjFileEvent *ev = (CgLoadObjFileEvent *)e;
@@ -175,8 +177,8 @@ void CgSceneControl::handleEvent(CgBaseEvent *e)
         std::vector<unsigned int> indx;
         loader->getFaceIndexData(indx);
 
-        m_cube->init(pos, norm, indx);
-        m_renderer->init(m_cube);
+        m_loaded_obj->init(pos, norm, indx);
+        m_renderer->init(m_loaded_obj);
         m_renderer->redraw();
     }
 
@@ -237,6 +239,10 @@ void CgSceneControl::handleEvent(CgBaseEvent *e)
         else if (object == Cg::SolidOfRevolution)
         {
             m_curr_obj = m_solid_of_revolution;
+        }
+        else if (object == Cg::LoadedObj)
+        {
+            m_curr_obj = m_loaded_obj;
         }
         else
         {
