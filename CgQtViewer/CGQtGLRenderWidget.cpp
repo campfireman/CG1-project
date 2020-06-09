@@ -209,6 +209,7 @@ void CgQtGLRenderWidget::initializeGL()
 
     setShaderSourceFiles("../Source/CgShader/simple.vert", "../Source/CgShader/simple.frag");
     setUniformValue("mycolor", glm::vec4(0.0, 1.0, 0.0, 1.0));
+    setUniformValue("lighting", m_lighting ? 1 : 0);
 
     m_program->link();
 
@@ -350,6 +351,7 @@ void CgQtGLRenderWidget::slotCustomRotation()
 void CgQtGLRenderWidget::slotLighting()
 {
     m_lighting = !m_lighting;
+    setUniformValue("lighting", m_lighting ? 1 : 0);
     update();
 }
 

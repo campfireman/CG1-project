@@ -189,12 +189,18 @@ void CgQtGui::createOptionPanelExample1(QWidget *parent)
     options_label->setAlignment(Qt::AlignCenter);
 
     /* option for drawing face normals */
-    myCheckBox1 = new QCheckBox("Show face normals");
-    myCheckBox1->setCheckable(true);
-    myCheckBox1->setChecked(false);
-    connect(myCheckBox1, SIGNAL(stateChanged(int)), this, SLOT(slotShowFaceNormalsChanged(int)));
-    tab1_control->addWidget(myCheckBox1);
+    auto face_normals = new QCheckBox("Show face normals");
+    face_normals->setCheckable(true);
+    face_normals->setChecked(false);
+    connect(face_normals, SIGNAL(stateChanged(int)), this, SLOT(slotShowFaceNormalsChanged(int)));
+    tab1_control->addWidget(face_normals);
 
+    /* option for drawing face normals */
+    auto vertex_normals = new QCheckBox("Show vertex normals");
+    vertex_normals->setCheckable(true);
+    vertex_normals->setChecked(false);
+    connect(vertex_normals, SIGNAL(stateChanged(int)), this, SLOT(slotShowVertexNormalsChanged(int)));
+    tab1_control->addWidget(vertex_normals);
     /* control RGB color scheme */
 
     auto RGBRedInput = new QSpinBox();
@@ -326,6 +332,12 @@ void CgQtGui::slotNChanged(int value)
 void CgQtGui::slotShowFaceNormalsChanged(int state)
 {
     CgBaseEvent *e = new CgCheckboxChangedEvent(Cg::CgCheckboxChangedEvent, Cg::FaceNormals, state);
+    notifyObserver(e);
+}
+
+void CgQtGui::slotShowVertexNormalsChanged(int state)
+{
+    CgBaseEvent *e = new CgCheckboxChangedEvent(Cg::CgCheckboxChangedEvent, Cg::VertexNormals, state);
     notifyObserver(e);
 }
 

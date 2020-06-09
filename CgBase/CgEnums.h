@@ -403,7 +403,8 @@ namespace Cg
 
 	typedef enum CheckboxType
 	{
-		FaceNormals
+		FaceNormals,
+		VertexNormals,
 	} CheckboxType;
 
 	typedef enum SelectionType

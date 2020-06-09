@@ -5,6 +5,8 @@
 
 void Utils::createNormals(std::vector<glm::vec3> &vertices, std::vector<unsigned int> &triangle_indices, std::vector<glm::vec3> &face_normals, std::vector<glm::vec3> &vertex_normals)
 {
+    // vertex_normals.clear();
+    // face_normals.clear();
     std::vector<std::vector<glm::vec3>> vertex_normals_raw{};
     vertex_normals_raw.resize(vertices.size());
     for (int i = 0; i < triangle_indices.size(); i += 3)
@@ -28,9 +30,8 @@ void Utils::createNormals(std::vector<glm::vec3> &vertices, std::vector<unsigned
         {
             sum_of_elems += p;
         }
-        auto vertex_normal = sum_of_elems * glm::vec3(1.0 / normals.size(), 1.0 / normals.size(), 1.0 / normals.size());
+        auto vertex_normal = glm::normalize(sum_of_elems / (float)normals.size());
         vertex_normals.push_back(vertex_normal);
-        std::cout << glm::to_string(vertex_normal) << std::endl;
     }
 }
 

@@ -113,6 +113,7 @@ private slots:
     void slotIterationsChanged(int value);
     void slotNChanged(int value);
     void slotShowFaceNormalsChanged(int state);
+    void slotShowVertexNormalsChanged(int state);
     void slotObjectSelectionChanged(int object);
     void slotDrawButtonPressed();
     void slotButtonGroupSelectionChanged();

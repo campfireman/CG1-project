@@ -43,15 +43,18 @@ CgSceneControl::CgSceneControl() : m_rgb(glm::vec3(0.0, 1.0, 0.0))
     // m_solid_of_revolution = NULL;
     m_curr_obj = m_cube;
     m_loaded_obj = new CgLoadedObj(idCounter++);
-    m_lines = NULL;
+    m_face_normals = NULL;
+    m_vertex_normals = NULL;
 }
 
 CgSceneControl::~CgSceneControl()
 {
     if (m_cube != NULL)
         delete m_cube;
-    if (m_lines != NULL)
-        delete m_lines;
+    if (m_face_normals != NULL)
+        delete m_face_normals;
+    if (m_vertex_normals != NULL)
+        delete m_vertex_normals;
 }
 
 void CgSceneControl::setRenderer(CgBaseRenderer *r)
@@ -74,6 +77,7 @@ void CgSceneControl::renderObjects()
 {
     // Materialeigenschaften setzen
     // sollte ja eigentlich pro Objekt unterschiedlich sein können, naja bekommen sie schon hin....
+    m_renderer->setUniformValue("lightpos", glm::vec4(0.0, -10.0, 10.0, 1.0));
 
     m_renderer->setUniformValue("matDiffuseColor", glm::vec4(0.35, 0.31, 0.09, 1.0));
     m_renderer->setUniformValue("lightDiffuseColor", glm::vec4(1.0, 1.0, 1.0, 1.0));
@@ -87,15 +91,23 @@ void CgSceneControl::renderObjects()
     glm::mat4 mv_matrix = m_lookAt_matrix * m_trackball_rotation * m_current_transformation;
     glm::mat3 normal_matrix = glm::transpose(glm::inverse(glm::mat3(mv_matrix)));
 
+    m_renderer->setUniformValue("lookAtMatrix", m_lookAt_matrix);
     m_renderer->setUniformValue("projMatrix", m_proj_matrix);
     m_renderer->setUniformValue("modelviewMatrix", mv_matrix);
     m_renderer->setUniformValue("normalMatrix", normal_matrix);
 
     if (m_curr_obj != NULL)
         m_renderer->render(m_curr_obj);
-    if (m_lines != NULL)
+    if (m_face_normals != NULL)
     {
-        for (auto &line : *m_lines)
+        for (auto &line : *m_face_normals)
+        {
+            m_renderer->render(line);
+        }
+    }
+    if (m_vertex_normals != NULL)
+    {
+        for (auto &line : *m_vertex_normals)
         {
             m_renderer->render(line);
         }
@@ -190,10 +202,15 @@ void CgSceneControl::handleEvent(CgBaseEvent *e)
         Cg::ButtonType button = ev->getButton();
         if (button == Cg::Draw)
         {
-            if (m_lines != NULL)
+            if (m_face_normals != NULL)
             {
-                delete m_lines;
-                m_lines = buildFaceNormals();
+                delete m_face_normals;
+                m_face_normals = buildFaceNormals();
+            }
+            if (m_vertex_normals != NULL)
+            {
+                delete m_vertex_normals;
+                m_vertex_normals = buildVertexNormals();
             }
             m_renderer->redraw();
         }
@@ -208,14 +225,29 @@ void CgSceneControl::handleEvent(CgBaseEvent *e)
         {
             if (state == Qt::Checked)
             {
-                m_lines = buildFaceNormals();
+                m_face_normals = buildFaceNormals();
             }
             else if (state == Qt::Unchecked)
             {
-                if (m_lines != NULL)
+                if (m_face_normals != NULL)
                 {
-                    delete m_lines;
-                    m_lines = NULL;
+                    delete m_face_normals;
+                    m_face_normals = NULL;
+                }
+            }
+        }
+        if (checkbox == Cg::VertexNormals)
+        {
+            if (state == Qt::Checked)
+            {
+                m_vertex_normals = buildVertexNormals();
+            }
+            else if (state == Qt::Unchecked)
+            {
+                if (m_vertex_normals != NULL)
+                {
+                    delete m_vertex_normals;
+                    m_vertex_normals = NULL;
                 }
             }
         }
@@ -327,6 +359,27 @@ std::vector<CgPolyline *> *CgSceneControl::buildFaceNormals()
             triangle_normals->push_back(line);
         }
         return triangle_normals;
+    }
+    return NULL;
+}
+
+std::vector<CgPolyline *> *CgSceneControl::buildVertexNormals()
+{
+    if (this->m_curr_obj != NULL)
+    {
+        std::vector<CgPolyline *> *vertex_normals = new std::vector<CgPolyline *>{};
+        auto normals = m_curr_obj->getVertexNormals();
+        auto vertices = m_curr_obj->getVertices();
+
+        for (int i = 0; i < vertices.size(); i++)
+        {
+            auto vertex = vertices[i];
+            auto normal = normals[i];
+            auto line = new CgPolyline(idCounter++, std::vector<glm::vec3>{vertex, vertex + normal}, glm::vec3(255.0, 80.0, 30.0), 1);
+            m_renderer->init(line);
+            vertex_normals->push_back(line);
+        }
+        return vertex_normals;
     }
     return NULL;
 }

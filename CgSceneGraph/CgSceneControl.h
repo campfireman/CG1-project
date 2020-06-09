@@ -25,6 +25,7 @@ public:
     void renderObjects();
 
     std::vector<CgPolyline *> *buildFaceNormals();
+    std::vector<CgPolyline *> *buildVertexNormals();
 
     static unsigned int idCounter;
 
@@ -36,7 +37,8 @@ private:
     CgBaseTriangleMesh *m_curr_obj;
     CgLoadedObj *m_loaded_obj;
 
-    std::vector<CgPolyline *> *m_lines;
+    std::vector<CgPolyline *> *m_face_normals;
+    std::vector<CgPolyline *> *m_vertex_normals;
     glm::vec3 m_rgb;
 
     glm::mat4 m_current_transformation;
