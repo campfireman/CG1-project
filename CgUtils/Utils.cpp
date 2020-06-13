@@ -2,11 +2,11 @@
 #include <iostream>
 #include <numeric>
 #include <glm/gtx/string_cast.hpp>
-
+#include <math.h>
 void Utils::createNormals(std::vector<glm::vec3> &vertices, std::vector<unsigned int> &triangle_indices, std::vector<glm::vec3> &face_normals, std::vector<glm::vec3> &vertex_normals)
 {
-    // vertex_normals.clear();
-    // face_normals.clear();
+    vertex_normals.clear();
+    face_normals.clear();
     std::vector<std::vector<glm::vec3>> vertex_normals_raw{};
     vertex_normals_raw.resize(vertices.size());
     for (int i = 0; i < triangle_indices.size(); i += 3)
@@ -28,7 +28,10 @@ void Utils::createNormals(std::vector<glm::vec3> &vertices, std::vector<unsigned
         auto sum_of_elems = glm::vec3(0.0, 0.0, 0.0);
         for (auto &p : normals)
         {
-            sum_of_elems += p;
+            if (isnan(p[0]) == 0)
+            {
+                sum_of_elems += p;
+            }
         }
         auto vertex_normal = glm::normalize(sum_of_elems / (float)normals.size());
         vertex_normals.push_back(vertex_normal);

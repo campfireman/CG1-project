@@ -77,7 +77,7 @@ void CgSceneControl::renderObjects()
 {
     // Materialeigenschaften setzen
     // sollte ja eigentlich pro Objekt unterschiedlich sein können, naja bekommen sie schon hin....
-    m_renderer->setUniformValue("lightpos", glm::vec4(0.0, -10.0, 10.0, 1.0));
+    m_renderer->setUniformValue("lightpos", glm::vec4(0.0, -15.0, 15.0, 1.0));
 
     m_renderer->setUniformValue("matDiffuseColor", glm::vec4(0.35, 0.31, 0.09, 1.0));
     m_renderer->setUniformValue("lightDiffuseColor", glm::vec4(1.0, 1.0, 1.0, 1.0));

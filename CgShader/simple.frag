@@ -24,8 +24,8 @@ void main() {
 
       vec4 ambient =  k_a * matAmbientColor * lightAmbientColor;
       vec4 intensity = ambient;
-      vec4 L = vec4(vert, 0.0) - light;
-      vec4 N = vec4(vert, 0.0) + vec4(vertNormal, 0.0);
+      vec4 L = vec4(vert, 1.0) - light;
+      vec4 N = vec4(vert, 1.0) + vec4(vertNormal, 0.0);
       float angle = dot(L, N);
 
       if (angle > 0) {
@@ -36,7 +36,7 @@ void main() {
          vec4 specular =  k_s * pow(dot(H, N), 5) * matSpecularColor * lightSpecularColor;
          intensity = intensity + diffuse + specular;
       } 
-      gl_FragColor = mycolor * intensity;
+      gl_FragColor = intensity;
    } else {
       gl_FragColor = mycolor;
    }
