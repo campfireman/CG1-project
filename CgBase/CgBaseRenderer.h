@@ -2,6 +2,7 @@
 #define CGBASERENDERER
 
 #include <glm/glm.hpp>
+#include <string>
 class CgBaseRenderableObject;
 class CgBaseSceneControl;
 class CgBaseImage;

@@ -1,5 +1,6 @@
 #include "CgSceneControl.h"
 #include "CgBase/CgEnums.h"
+#include "CgBase/CgBaseRenderableObject.h"
 #include "CgEvents/CgMouseEvent.h"
 #include "CgEvents/CgKeyEvent.h"
 #include "CgEvents/CgWindowResizeEvent.h"
@@ -24,8 +25,9 @@
 
 unsigned int CgSceneControl::idCounter = 100;
 
-CgSceneControl::CgSceneControl() : m_rgb(glm::vec3(0.0, 1.0, 0.0))
+CgSceneControl::CgSceneControl() : m_cur_color(glm::vec4(0.0, 1.0, 0.0, 1.0))
 {
+    // scenery
     m_current_transformation = glm::mat4(1.);
     m_lookAt_matrix = glm::lookAt(glm::vec3(0.0, 0.0, 5.0), glm::vec3(0.0, 0.0, 0.0), glm::vec3(0.0, 1.0, 0.0));
     m_proj_matrix = glm::mat4x4(glm::vec4(1.792591, 0.0, 0.0, 0.0), glm::vec4(0.0, 1.792591, 0.0, 0.0), glm::vec4(0.0, 0.0, -1.0002, -1.0), glm::vec4(0.0, 0.0, -0.020002, 0.0));
@@ -40,11 +42,40 @@ CgSceneControl::CgSceneControl() : m_rgb(glm::vec3(0.0, 1.0, 0.0))
         20,
         0,
         2);
-    // m_solid_of_revolution = NULL;
-    m_curr_obj = m_cube;
     m_loaded_obj = new CgLoadedObj(idCounter++);
     m_face_normals = NULL;
     m_vertex_normals = NULL;
+
+    // graph
+    m_cube_node = new CgScenegraphNode(std::vector<CgBaseRenderableObject *>{m_cube},
+                                       glm::mat4(1.),
+                                       CgAppearance(glm::vec4(0.0, 1.0, 0.0, 1.0),
+                                                    glm::vec4(0.25, 0.22, 0.06, 1.0),
+                                                    glm::vec4(0.35, 0.31, 0.09, 1.0),
+                                                    glm::vec4(0.8, 0.72, 0.21, 1.0)),
+                                       NULL);
+
+    m_solid_of_revolution_node = new CgScenegraphNode(
+        std::vector<CgBaseRenderableObject *>{m_solid_of_revolution},
+        glm::mat4(1.),
+        CgAppearance(glm::vec4(0.0, 1.0, 0.0, 1.0),
+                     glm::vec4(0.25, 0.22, 0.06, 1.0),
+                     glm::vec4(0.35, 0.31, 0.09, 1.0),
+                     glm::vec4(0.8, 0.72, 0.21, 1.0)),
+        NULL);
+    m_loaded_obj_node = new CgScenegraphNode(
+        std::vector<CgBaseRenderableObject *>{m_loaded_obj},
+        glm::mat4(1.),
+        CgAppearance(glm::vec4(0.0, 1.0, 0.0, 1.0),
+                     glm::vec4(0.25, 0.22, 0.06, 1.0),
+                     glm::vec4(0.35, 0.31, 0.09, 1.0),
+                     glm::vec4(0.8, 0.72, 0.21, 1.0)),
+        NULL);
+    m_curr_obj = NULL;
+    m_chess_scenegraph = NULL;
+    m_object_scenegraph = new CgScenegraph(m_cube_node);
+    m_cur_scenegraph = m_object_scenegraph;
+    this->resetCurNode();
 }
 
 CgSceneControl::~CgSceneControl()
@@ -76,19 +107,9 @@ void CgSceneControl::setRenderer(CgBaseRenderer *r)
 void CgSceneControl::renderObjects()
 {
     // Materialeigenschaften setzen
-    // sollte ja eigentlich pro Objekt unterschiedlich sein können, naja bekommen sie schon hin....
     m_renderer->setUniformValue("lightpos", glm::vec4(0.0, -15.0, 15.0, 1.0));
 
-    m_renderer->setUniformValue("matDiffuseColor", glm::vec4(0.35, 0.31, 0.09, 1.0));
-    m_renderer->setUniformValue("lightDiffuseColor", glm::vec4(1.0, 1.0, 1.0, 1.0));
-
-    m_renderer->setUniformValue("matAmbientColor", glm::vec4(0.25, 0.22, 0.06, 1.0));
-    m_renderer->setUniformValue("lightAmbientColor", glm::vec4(1.0, 1.0, 1.0, 1.0));
-
-    m_renderer->setUniformValue("matSpecularColor", glm::vec4(0.8, 0.72, 0.21, 1.0));
-    m_renderer->setUniformValue("lightSpecularColor", glm::vec4(1.0, 1.0, 1.0, 1.0));
-
-    glm::mat4 mv_matrix = m_lookAt_matrix * m_trackball_rotation * m_current_transformation;
+    glm::mat4 mv_matrix = m_lookAt_matrix * m_trackball_rotation;
     glm::mat3 normal_matrix = glm::transpose(glm::inverse(glm::mat3(mv_matrix)));
 
     m_renderer->setUniformValue("lookAtMatrix", m_lookAt_matrix);
@@ -96,21 +117,9 @@ void CgSceneControl::renderObjects()
     m_renderer->setUniformValue("modelviewMatrix", mv_matrix);
     m_renderer->setUniformValue("normalMatrix", normal_matrix);
 
-    if (m_curr_obj != NULL)
-        m_renderer->render(m_curr_obj);
-    if (m_face_normals != NULL)
+    if (m_cur_scenegraph != NULL)
     {
-        for (auto &line : *m_face_normals)
-        {
-            m_renderer->render(line);
-        }
-    }
-    if (m_vertex_normals != NULL)
-    {
-        for (auto &line : *m_vertex_normals)
-        {
-            m_renderer->render(line);
-        }
+        m_cur_scenegraph->render(m_renderer, mv_matrix);
     }
 }
 
@@ -202,16 +211,6 @@ void CgSceneControl::handleEvent(CgBaseEvent *e)
         Cg::ButtonType button = ev->getButton();
         if (button == Cg::Draw)
         {
-            if (m_face_normals != NULL)
-            {
-                delete m_face_normals;
-                m_face_normals = buildFaceNormals();
-            }
-            if (m_vertex_normals != NULL)
-            {
-                delete m_vertex_normals;
-                m_vertex_normals = buildVertexNormals();
-            }
             m_renderer->redraw();
         }
     }
@@ -225,14 +224,13 @@ void CgSceneControl::handleEvent(CgBaseEvent *e)
         {
             if (state == Qt::Checked)
             {
-                m_face_normals = buildFaceNormals();
+                buildFaceNormals();
             }
             else if (state == Qt::Unchecked)
             {
                 if (m_face_normals != NULL)
                 {
-                    delete m_face_normals;
-                    m_face_normals = NULL;
+                    m_cur_scenegraph->deleteNode(m_face_normals);
                 }
             }
         }
@@ -240,14 +238,13 @@ void CgSceneControl::handleEvent(CgBaseEvent *e)
         {
             if (state == Qt::Checked)
             {
-                m_vertex_normals = buildVertexNormals();
+                buildVertexNormals();
             }
             else if (state == Qt::Unchecked)
             {
                 if (m_vertex_normals != NULL)
                 {
-                    delete m_vertex_normals;
-                    m_vertex_normals = NULL;
+                    m_cur_scenegraph->deleteNode(m_vertex_normals);
                 }
             }
         }
@@ -262,20 +259,19 @@ void CgSceneControl::handleEvent(CgBaseEvent *e)
 
         if (object == Cg::Cube)
         {
-            m_curr_obj = m_cube;
+            m_object_scenegraph->setRootNode(m_cube_node);
         }
         else if (object == Cg::SolidOfRevolution)
         {
-            m_curr_obj = m_solid_of_revolution;
+            m_object_scenegraph->setRootNode(m_solid_of_revolution_node);
         }
         else if (object == Cg::LoadedObj)
         {
-            m_curr_obj = m_loaded_obj;
+            m_object_scenegraph->setRootNode(m_loaded_obj_node);
         }
-        else
-        {
-            m_curr_obj = NULL;
-        }
+        this->resetCurNode();
+        m_cur_node->setColor(m_cur_color);
+        this->rebuildNormals();
     }
 
     if (e->getType() == Cg::CgSORChangedEvent)
@@ -285,66 +281,94 @@ void CgSceneControl::handleEvent(CgBaseEvent *e)
         Cg::SOROptionType option = ev->getOption();
         int value = ev->getValue();
         std::cout << ev->getValue() << std::endl;
+
         CgSolidOfRevolution *old_obj = m_solid_of_revolution;
         CgSolidOfRevolution *new_obj = NULL;
+
+        auto contour = old_obj->getContourPlot();
+        auto steps = old_obj->getLateralSteps();
+        auto iterations = old_obj->getIterations();
+        auto n = old_obj->getN();
+
         if (option == Cg::LateralSteps)
         {
-            new_obj = new CgSolidOfRevolution(
-                idCounter++,
-                old_obj->getContourPlot(),
-                value,
-                old_obj->getIterations(),
-                old_obj->getN());
+            steps = value;
         }
         else if (option == Cg::Iterations)
         {
-            new_obj = new CgSolidOfRevolution(
-                idCounter++,
-                old_obj->getContourPlot(),
-                old_obj->getLateralSteps(),
-                value,
-                old_obj->getN());
+            iterations = value;
         }
         else if (option == Cg::N)
         {
-            new_obj = new CgSolidOfRevolution(
-                idCounter++,
-                old_obj->getContourPlot(),
-                old_obj->getLateralSteps(),
-                old_obj->getIterations(),
-                value);
+            n = value;
         }
-        if (new_obj != NULL)
+        new_obj = new CgSolidOfRevolution(
+            idCounter++,
+            contour,
+            steps,
+            iterations,
+            n);
+        if (m_curr_obj == old_obj)
         {
-            if (m_curr_obj == old_obj)
-            {
-                m_curr_obj = new_obj;
-            }
-            m_solid_of_revolution = new_obj;
-            m_renderer->init(new_obj);
-            // delete old_obj;
+            m_curr_obj = new_obj;
         }
+        m_solid_of_revolution = new_obj;
+        m_solid_of_revolution_node->setObjects(std::vector<CgBaseRenderableObject *>{m_solid_of_revolution});
+        m_renderer->init(new_obj);
+        this->rebuildNormals();
+        delete old_obj;
     }
     if (e->getType() == Cg::CgColorChangeEvent)
     {
         std::cout << "Color changed event" << std::endl;
         CgColorChangeEvent *ev = (CgColorChangeEvent *)e;
         std::cout << ev->getValue() << std::endl;
-        m_rgb[ev->getColor()] = ev->getValue() / 255.0;
-        m_renderer->setUniformValue("mycolor", glm::vec4(m_rgb[0], m_rgb[1], m_rgb[2], 1.0));
+        m_cur_color[ev->getColor()] = ev->getValue() / 255.0;
+        m_cur_node->setColor(m_cur_color);
     }
     // an der Stelle an der ein Event abgearbeitet ist wird es auch gelöscht.
     delete e;
 }
 
-std::vector<CgPolyline *> *CgSceneControl::buildFaceNormals()
+void CgSceneControl::resetCurNode()
 {
-    if (this->m_curr_obj != NULL)
+    if (m_cur_scenegraph != NULL)
     {
-        std::vector<CgPolyline *> *triangle_normals = new std::vector<CgPolyline *>{};
-        auto normals = m_curr_obj->getFaceNormals();
-        auto triangle_indices = m_curr_obj->getTriangleIndices();
-        auto vertices = m_curr_obj->getVertices();
+        m_cur_node = m_cur_scenegraph->getRootNode();
+    }
+}
+
+void CgSceneControl::rebuildNormals()
+{
+    if (m_face_normals != NULL)
+    {
+        this->m_cur_scenegraph->deleteNode(m_face_normals);
+        this->buildFaceNormals();
+    }
+    if (m_vertex_normals != NULL)
+    {
+        this->m_cur_scenegraph->deleteNode(m_vertex_normals);
+        this->buildVertexNormals();
+    }
+}
+
+void CgSceneControl::buildFaceNormals()
+{
+    if (m_cur_node == NULL)
+    {
+        return;
+    }
+    auto face_normals = std::vector<CgBaseRenderableObject *>{};
+    for (auto &object : m_cur_node->getObjects())
+    {
+        auto obj = dynamic_cast<CgBaseTriangleMesh *>(object);
+        if (obj == NULL)
+        {
+            continue;
+        }
+        auto normals = obj->getFaceNormals();
+        auto vertices = obj->getVertices();
+        auto triangle_indices = obj->getTriangleIndices();
 
         for (int i = 0; i < triangle_indices.size(); i += 3)
         {
@@ -356,30 +380,41 @@ std::vector<CgPolyline *> *CgSceneControl::buildFaceNormals()
             auto normal = normals[i / 3];
             auto line = new CgPolyline(idCounter++, std::vector<glm::vec3>{centroid, centroid + normal}, glm::vec3(255.0, 80.0, 30.0), 1);
             m_renderer->init(line);
-            triangle_normals->push_back(line);
+            face_normals.push_back(line);
         }
-        return triangle_normals;
     }
-    return NULL;
+    auto normals = new CgScenegraphNode(face_normals, glm::mat4(1.), m_cur_node->getAppearance(), m_cur_node);
+    m_cur_node->addChild(normals);
+    m_face_normals = normals;
 }
 
-std::vector<CgPolyline *> *CgSceneControl::buildVertexNormals()
+void CgSceneControl::buildVertexNormals()
 {
-    if (this->m_curr_obj != NULL)
+    if (m_cur_node == NULL)
     {
-        std::vector<CgPolyline *> *vertex_normals = new std::vector<CgPolyline *>{};
-        auto normals = m_curr_obj->getVertexNormals();
-        auto vertices = m_curr_obj->getVertices();
+        return;
+    }
+    auto vertex_normals = std::vector<CgBaseRenderableObject *>{};
+    for (auto &object : m_cur_node->getObjects())
+    {
+        auto obj = dynamic_cast<CgBaseTriangleMesh *>(object);
+        if (obj == NULL)
+        {
+            continue;
+        }
+        auto normals = obj->getVertexNormals();
+        auto vertices = obj->getVertices();
 
         for (int i = 0; i < vertices.size(); i++)
         {
-            auto vertex = vertices[i];
-            auto normal = normals[i];
+            glm::vec3 vertex = vertices[i];
+            glm::vec3 normal = normals[i];
             auto line = new CgPolyline(idCounter++, std::vector<glm::vec3>{vertex, vertex + normal}, glm::vec3(255.0, 80.0, 30.0), 1);
             m_renderer->init(line);
-            vertex_normals->push_back(line);
+            vertex_normals.push_back(line);
         }
-        return vertex_normals;
     }
-    return NULL;
+    auto normals = new CgScenegraphNode(vertex_normals, glm::mat4(1.), m_cur_node->getAppearance(), m_cur_node);
+    m_cur_node->addChild(normals);
+    m_vertex_normals = normals;
 }

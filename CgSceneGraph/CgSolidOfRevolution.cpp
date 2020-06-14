@@ -10,6 +10,7 @@ CgSolidOfRevolution::CgSolidOfRevolution(unsigned int id, CgPolyline *contour_pl
     double step_size = 2 * M_PI / (double)m_lateral_steps;
     std::vector<glm::vec3> contour = Utils::laneRiesenfeld(m_contour_plot->getVertices(), m_iterations, m_n);
 
+    // close body
     auto first_point = contour[0];
     auto last_point = contour[contour.size() - 1];
     if (first_point[0] != 0)
@@ -20,8 +21,8 @@ CgSolidOfRevolution::CgSolidOfRevolution(unsigned int id, CgPolyline *contour_pl
     {
         contour.push_back(glm::vec3(0.0, last_point[1], 0.0));
     }
-
     m_vertices.insert(m_vertices.end(), contour.begin(), contour.end());
+    // rotate body
     double phi = 0.0;
     for (int i = 1; i < m_lateral_steps; ++i)
     {
@@ -42,6 +43,7 @@ CgSolidOfRevolution::CgSolidOfRevolution(unsigned int id, CgPolyline *contour_pl
             }
         }
     }
+    // connect last points to first points
     for (int j = 0; j < contour.size(); j++)
     {
         if (j > 0)

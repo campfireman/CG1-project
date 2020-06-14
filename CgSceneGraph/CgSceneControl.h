@@ -4,6 +4,10 @@
 #include "CgBase/CgObserver.h"
 #include "CgBase/CgBaseSceneControl.h"
 #include "CgBase/CgBaseTriangleMesh.h"
+#include "CgScenegraph.h"
+#include "CgAppearance.h"
+#include "CgScenegraphNode.h"
+
 #include <glm/glm.hpp>
 #include <vector>
 
@@ -24,22 +28,33 @@ public:
     void setRenderer(CgBaseRenderer *r);
     void renderObjects();
 
-    std::vector<CgPolyline *> *buildFaceNormals();
-    std::vector<CgPolyline *> *buildVertexNormals();
+    void resetCurNode();
+
+    void buildFaceNormals();
+    void buildVertexNormals();
+    void rebuildNormals();
 
     static unsigned int idCounter;
 
 private:
     CgBaseRenderer *m_renderer;
 
-    CgCube *m_cube;
-    CgSolidOfRevolution *m_solid_of_revolution;
     CgBaseTriangleMesh *m_curr_obj;
     CgLoadedObj *m_loaded_obj;
+    CgCube *m_cube;
+    CgSolidOfRevolution *m_solid_of_revolution;
 
-    std::vector<CgPolyline *> *m_face_normals;
-    std::vector<CgPolyline *> *m_vertex_normals;
-    glm::vec3 m_rgb;
+    CgScenegraph *m_cur_scenegraph;
+    CgScenegraph *m_object_scenegraph;
+    CgScenegraph *m_chess_scenegraph;
+    CgScenegraphNode *m_cube_node;
+    CgScenegraphNode *m_solid_of_revolution_node;
+    CgScenegraphNode *m_loaded_obj_node;
+    CgScenegraphNode *m_cur_node;
+
+    CgScenegraphNode *m_face_normals;
+    CgScenegraphNode *m_vertex_normals;
+    glm::vec4 m_cur_color;
 
     glm::mat4 m_current_transformation;
     glm::mat4 m_trackball_rotation;
