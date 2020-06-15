@@ -47,10 +47,8 @@ void CgScenegraph::render_rec(CgBaseRenderer *renderer, CgScenegraphNode *node)
     this->pushMatrix();
     this->applyTransformation(node->getCurrentTransformation());
     node->render(renderer, m_stack.top());
-    std::cout << "rendering" << std::endl;
     for (auto &child : node->getChildren())
     {
-
         render_rec(renderer, child);
     }
     this->popMatrix();

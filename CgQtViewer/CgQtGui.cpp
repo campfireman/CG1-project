@@ -126,13 +126,37 @@ QSlider *CgQtGui::createSlider()
 void CgQtGui::createOptionPanelExample1(QWidget *parent)
 {
     QVBoxLayout *tab1_control = new QVBoxLayout();
-    QHBoxLayout *subBox = new QHBoxLayout();
 
     /* Control which object type to draw */
-    QGroupBox *myGroupBox = new QGroupBox("Choose the object to draw");
+    QHBoxLayout *sceneBox = new QHBoxLayout();
+    QGroupBox *sceneSelectionGroupBox = new QGroupBox("Choose the scene to draw");
     // select object type
-    myButtonGroup = new QButtonGroup(subBox);
-    myButtonGroup->setExclusive(true);
+    auto sceneSelectionGroup = new QButtonGroup(sceneBox);
+    sceneSelectionGroup->setExclusive(true);
+
+    QRadioButton *object_scene = new QRadioButton("Single objects scene");
+    QRadioButton *chess_scene = new QRadioButton("Chess Scene");
+
+    object_scene->setChecked(true);
+
+    sceneSelectionGroup->addButton(object_scene, Cg::ObjectScene);
+    sceneSelectionGroup->addButton(chess_scene, Cg::ChessScene);
+    connect(sceneSelectionGroup, SIGNAL(buttonClicked(int)), this, SLOT(slotSceneSelectionChanged(int)));
+
+    QVBoxLayout *sceneVbox = new QVBoxLayout;
+    sceneVbox->addWidget(object_scene);
+    sceneVbox->addWidget(chess_scene);
+    sceneVbox->addStretch(1);
+    sceneSelectionGroupBox->setLayout(sceneVbox);
+    sceneBox->addWidget(sceneSelectionGroupBox);
+    tab1_control->addLayout(sceneBox);
+
+    /* Control which object type to draw */
+    QHBoxLayout *objectBox = new QHBoxLayout();
+    QGroupBox *objectSelectionGroupBox = new QGroupBox("Choose the object to draw");
+    // select object type
+    auto objectSelectionGroup = new QButtonGroup(objectBox);
+    objectSelectionGroup->setExclusive(true);
 
     QRadioButton *radiobutton1 = new QRadioButton("Cube");
     QRadioButton *radiobutton2 = new QRadioButton("Solid of revolution");
@@ -140,19 +164,19 @@ void CgQtGui::createOptionPanelExample1(QWidget *parent)
 
     radiobutton1->setChecked(true);
 
-    myButtonGroup->addButton(radiobutton1, Cg::Cube);
-    myButtonGroup->addButton(radiobutton2, Cg::SolidOfRevolution);
-    myButtonGroup->addButton(radiobutton3, Cg::LoadedObj);
-    connect(myButtonGroup, SIGNAL(buttonClicked(int)), this, SLOT(slotObjectSelectionChanged(int)));
+    objectSelectionGroup->addButton(radiobutton1, Cg::Cube);
+    objectSelectionGroup->addButton(radiobutton2, Cg::SolidOfRevolution);
+    objectSelectionGroup->addButton(radiobutton3, Cg::LoadedObj);
+    connect(objectSelectionGroup, SIGNAL(buttonClicked(int)), this, SLOT(slotObjectSelectionChanged(int)));
 
-    QVBoxLayout *vbox = new QVBoxLayout;
-    vbox->addWidget(radiobutton1);
-    vbox->addWidget(radiobutton2);
-    vbox->addWidget(radiobutton3);
-    vbox->addStretch(1);
-    myGroupBox->setLayout(vbox);
-    subBox->addWidget(myGroupBox);
-    tab1_control->addLayout(subBox);
+    QVBoxLayout *objectVbox = new QVBoxLayout;
+    objectVbox->addWidget(radiobutton1);
+    objectVbox->addWidget(radiobutton2);
+    objectVbox->addWidget(radiobutton3);
+    objectVbox->addStretch(1);
+    objectSelectionGroupBox->setLayout(objectVbox);
+    objectBox->addWidget(objectSelectionGroupBox);
+    tab1_control->addLayout(objectBox);
 
     /*Example for using a label */
     QLabel *sor_options_label = new QLabel("Solid of revolution options");
@@ -344,6 +368,11 @@ void CgQtGui::slotShowVertexNormalsChanged(int state)
 void CgQtGui::slotObjectSelectionChanged(int object)
 {
     CgBaseEvent *e = new CgSelectionChangedEvent(Cg::CgSelectionChangedEvent, Cg::Object, object);
+    notifyObserver(e);
+}
+void CgQtGui::slotSceneSelectionChanged(int object)
+{
+    CgBaseEvent *e = new CgSelectionChangedEvent(Cg::CgSelectionChangedEvent, Cg::Scene, object);
     notifyObserver(e);
 }
 void CgQtGui::slotLoadMeshFile()

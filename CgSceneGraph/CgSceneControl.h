@@ -10,6 +10,8 @@
 
 #include <glm/glm.hpp>
 #include <vector>
+#include <filesystem>
+namespace fs = std::filesystem;
 
 class CgBaseEvent;
 class CgBaseRenderer;
@@ -33,6 +35,10 @@ public:
     void buildFaceNormals();
     void buildVertexNormals();
     void rebuildNormals();
+    void buildChessScene();
+
+    static void loadObject(CgLoadedObj *obj, std::string filename);
+    static fs::path getObjectDirectory();
 
     static unsigned int idCounter;
 
@@ -43,6 +49,14 @@ private:
     CgLoadedObj *m_loaded_obj;
     CgCube *m_cube;
     CgSolidOfRevolution *m_solid_of_revolution;
+
+    CgCube *m_ch_cube;
+    CgLoadedObj *m_ch_king;
+    CgLoadedObj *m_ch_queen;
+    CgLoadedObj *m_ch_rook;
+    CgLoadedObj *m_ch_bishop;
+    CgLoadedObj *m_ch_knight;
+    CgSolidOfRevolution *m_ch_pawn;
 
     CgScenegraph *m_cur_scenegraph;
     CgScenegraph *m_object_scenegraph;

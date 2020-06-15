@@ -5,14 +5,13 @@ in vec3 vertNormal;
 in vec4 light;
 
 uniform vec4 mycolor;
+uniform vec4 lightColor;
 uniform vec4 matAmbientColor;
-uniform vec4 lightAmbientColor;
 
 uniform vec4 matDiffuseColor;
-uniform vec4 lightDiffuseColor;
 
 uniform vec4 matSpecularColor;
-uniform vec4 lightSpecularColor;
+uniform float specShininess;
 
 uniform int lighting;
 
@@ -22,20 +21,17 @@ void main() {
       float k_d = 0.1;
       float k_s = 0.1;
 
-      vec4 ambient =  k_a * matAmbientColor * lightAmbientColor;
+      vec4 ambient =  k_a * lightColor * matAmbientColor;
       vec4 intensity = ambient;
       vec4 L = vec4(vert, 1.0) - light;
       vec4 N = vec4(vert, 1.0) + vec4(vertNormal, 0.0);
-      float angle = dot(L, N);
 
-      if (angle > 0) {
-         vec4 diffuse =  k_d * angle * lightDiffuseColor * matDiffuseColor;
-         float length_L = length(L);
-         vec4 H = L / length_L;
-         
-         vec4 specular =  k_s * pow(dot(H, N), 5) * matSpecularColor * lightSpecularColor;
-         intensity = intensity + diffuse + specular;
-      } 
+      vec4 diffuse =  k_d * max(dot(L, N), 0.0) * lightColor * matDiffuseColor;
+      float length_L = length(L);
+      vec4 H = L / length_L;
+      
+      vec4 specular =  k_s * pow(max(dot(H, N), 0.0), specShininess) * lightColor * matSpecularColor;
+      intensity = intensity + diffuse + specular;
       gl_FragColor = intensity;
    } else {
       gl_FragColor = mycolor;

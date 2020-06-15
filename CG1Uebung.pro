@@ -4,6 +4,10 @@ TEMPLATE = app
 
 TARGET = CgViewer
 
+QMAKE_CXXFLAGS += -std=c++17
+
+CONFIG += c++17
+
 SOURCES += main.cpp \
     CgQtViewer/CGQtGLRenderWidget.cpp \
     CgQtViewer/CgQtGui.cpp \

@@ -41,6 +41,11 @@ void CgScenegraphNode::setCurrentTransformation(glm::mat4 transformation)
     m_current_transformation = transformation;
 }
 
+void CgScenegraphNode::transform(glm::mat4 transformation)
+{
+    m_current_transformation *= transformation;
+}
+
 CgAppearance CgScenegraphNode::getAppearance() const
 {
     return m_appearance;
@@ -85,17 +90,14 @@ void CgScenegraphNode::render(CgBaseRenderer *renderer, glm::mat4 &transformatio
     renderer->setUniformValue("mycolor", m_appearance.getBaseColor());
 
     renderer->setUniformValue("matDiffuseColor", m_appearance.getMatDiffuseColor());
-    renderer->setUniformValue("lightDiffuseColor", m_appearance.getBaseColor());
 
     renderer->setUniformValue("matAmbientColor", m_appearance.getMatAmbientColor());
-    renderer->setUniformValue("lightAmbientColor", m_appearance.getBaseColor());
 
     renderer->setUniformValue("matSpecularColor", m_appearance.getMatSpecularColor());
-    renderer->setUniformValue("lightSpecularColor", m_appearance.getBaseColor());
+    renderer->setUniformValue("specShininess", m_appearance.getSpecShininess());
 
     for (CgBaseRenderableObject *&object : m_objects)
     {
-        std::cout << "render obj" << std::endl;
         renderer->render(object);
     }
 }

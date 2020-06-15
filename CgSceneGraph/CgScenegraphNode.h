@@ -19,6 +19,7 @@ public:
 
     glm::mat4 getCurrentTransformation() const;
     void setCurrentTransformation(glm::mat4 transformation);
+    void transform(glm::mat4 transformation);
 
     CgAppearance getAppearance() const;
     void setAppearance(CgAppearance appearance);

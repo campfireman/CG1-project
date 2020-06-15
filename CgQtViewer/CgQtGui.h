@@ -115,6 +115,7 @@ private slots:
     void slotShowFaceNormalsChanged(int state);
     void slotShowVertexNormalsChanged(int state);
     void slotObjectSelectionChanged(int object);
+    void slotSceneSelectionChanged(int object);
     void slotDrawButtonPressed();
     void slotButtonGroupSelectionChanged();
     void slotLoadMeshFile();

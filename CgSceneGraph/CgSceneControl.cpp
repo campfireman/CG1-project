@@ -52,7 +52,7 @@ CgSceneControl::CgSceneControl() : m_cur_color(glm::vec4(0.0, 1.0, 0.0, 1.0))
                                        CgAppearance(glm::vec4(0.0, 1.0, 0.0, 1.0),
                                                     glm::vec4(0.25, 0.22, 0.06, 1.0),
                                                     glm::vec4(0.35, 0.31, 0.09, 1.0),
-                                                    glm::vec4(0.8, 0.72, 0.21, 1.0)),
+                                                    glm::vec4(0.8, 0.72, 0.21, 1.0), 5),
                                        NULL);
 
     m_solid_of_revolution_node = new CgScenegraphNode(
@@ -61,7 +61,7 @@ CgSceneControl::CgSceneControl() : m_cur_color(glm::vec4(0.0, 1.0, 0.0, 1.0))
         CgAppearance(glm::vec4(0.0, 1.0, 0.0, 1.0),
                      glm::vec4(0.25, 0.22, 0.06, 1.0),
                      glm::vec4(0.35, 0.31, 0.09, 1.0),
-                     glm::vec4(0.8, 0.72, 0.21, 1.0)),
+                     glm::vec4(0.8, 0.72, 0.21, 1.0), 5),
         NULL);
     m_loaded_obj_node = new CgScenegraphNode(
         std::vector<CgBaseRenderableObject *>{m_loaded_obj},
@@ -69,10 +69,10 @@ CgSceneControl::CgSceneControl() : m_cur_color(glm::vec4(0.0, 1.0, 0.0, 1.0))
         CgAppearance(glm::vec4(0.0, 1.0, 0.0, 1.0),
                      glm::vec4(0.25, 0.22, 0.06, 1.0),
                      glm::vec4(0.35, 0.31, 0.09, 1.0),
-                     glm::vec4(0.8, 0.72, 0.21, 1.0)),
+                     glm::vec4(0.8, 0.72, 0.21, 1.0), 5),
         NULL);
     m_curr_obj = NULL;
-    m_chess_scenegraph = NULL;
+    buildChessScene();
     m_object_scenegraph = new CgScenegraph(m_cube_node);
     m_cur_scenegraph = m_object_scenegraph;
     this->resetCurNode();
@@ -93,6 +93,7 @@ void CgSceneControl::setRenderer(CgBaseRenderer *r)
     m_renderer = r;
     m_renderer->setSceneControl(this);
     m_renderer->setUniformValue("mycolor", glm::vec4(0.0, 1.0, 0.0, 1.0));
+    m_renderer->setUniformValue("lightColor", glm::vec4(1.0, 1.0, 1.0, 1.0));
 
     if (m_cube != NULL)
     {
@@ -102,14 +103,25 @@ void CgSceneControl::setRenderer(CgBaseRenderer *r)
     {
         m_renderer->init(m_solid_of_revolution);
     }
+
+    if (m_chess_scenegraph != NULL)
+    {
+        m_renderer->init(m_ch_cube);
+        m_renderer->init(m_ch_king);
+        m_renderer->init(m_ch_queen);
+        // CgLoadedObj *m_ch_rook;
+        // CgLoadedObj *m_ch_bishop;
+        // CgLoadedObj *m_ch_knight;
+        // CgSolidOfRevolution *m_ch_pawn;
+    }
 }
 
 void CgSceneControl::renderObjects()
 {
     // Materialeigenschaften setzen
-    m_renderer->setUniformValue("lightpos", glm::vec4(0.0, -15.0, 15.0, 1.0));
+    m_renderer->setUniformValue("lightpos", glm::vec4(0.0, -10.0, 10.0, 1.0));
 
-    glm::mat4 mv_matrix = m_lookAt_matrix * m_trackball_rotation;
+    glm::mat4 mv_matrix = m_lookAt_matrix * m_trackball_rotation * m_current_transformation;
     glm::mat3 normal_matrix = glm::transpose(glm::inverse(glm::mat3(mv_matrix)));
 
     m_renderer->setUniformValue("lookAtMatrix", m_lookAt_matrix);
@@ -184,21 +196,7 @@ void CgSceneControl::handleEvent(CgBaseEvent *e)
 
         CgLoadObjFileEvent *ev = (CgLoadObjFileEvent *)e;
 
-        ObjLoader *loader = new ObjLoader();
-        loader->load(ev->FileName());
-
-        std::cout << ev->FileName() << std::endl;
-
-        std::vector<glm::vec3> pos;
-        loader->getPositionData(pos);
-
-        std::vector<glm::vec3> norm;
-        loader->getNormalData(norm);
-
-        std::vector<unsigned int> indx;
-        loader->getFaceIndexData(indx);
-
-        m_loaded_obj->init(pos, norm, indx);
+        loadObject(m_loaded_obj, ev->FileName());
         m_renderer->init(m_loaded_obj);
         m_renderer->redraw();
     }
@@ -255,23 +253,40 @@ void CgSceneControl::handleEvent(CgBaseEvent *e)
         std::cout << "Selection Changed Event" << std::endl;
         CgSelectionChangedEvent *ev = (CgSelectionChangedEvent *)e;
         int object = ev->getValue();
+        Cg::SelectionType type = ev->getSelection();
         std::cout << ev->getValue() << std::endl;
 
-        if (object == Cg::Cube)
+        if (type == Cg::Object)
         {
-            m_object_scenegraph->setRootNode(m_cube_node);
+            if (object == Cg::Cube)
+            {
+                m_object_scenegraph->setRootNode(m_cube_node);
+            }
+            else if (object == Cg::SolidOfRevolution)
+            {
+                m_object_scenegraph->setRootNode(m_solid_of_revolution_node);
+            }
+            else if (object == Cg::LoadedObj)
+            {
+                m_object_scenegraph->setRootNode(m_loaded_obj_node);
+            }
+            this->resetCurNode();
+            m_cur_node->setColor(m_cur_color);
+            this->rebuildNormals();
         }
-        else if (object == Cg::SolidOfRevolution)
+        if (type == Cg::Scene)
         {
-            m_object_scenegraph->setRootNode(m_solid_of_revolution_node);
+            if (object == Cg::ObjectScene)
+            {
+                std::cout << "objects" << std::endl;
+                m_cur_scenegraph = m_object_scenegraph;
+            }
+            else if (object == Cg::ChessScene)
+            {
+                std::cout << "chess" << std::endl;
+                m_cur_scenegraph = m_chess_scenegraph;
+            }
         }
-        else if (object == Cg::LoadedObj)
-        {
-            m_object_scenegraph->setRootNode(m_loaded_obj_node);
-        }
-        this->resetCurNode();
-        m_cur_node->setColor(m_cur_color);
-        this->rebuildNormals();
     }
 
     if (e->getType() == Cg::CgSORChangedEvent)
@@ -417,4 +432,49 @@ void CgSceneControl::buildVertexNormals()
     auto normals = new CgScenegraphNode(vertex_normals, glm::mat4(1.), m_cur_node->getAppearance(), m_cur_node);
     m_cur_node->addChild(normals);
     m_vertex_normals = normals;
+}
+
+void CgSceneControl::buildChessScene()
+{
+    // colors
+    glm::vec4 brown = glm::vec4(205 / 255.0, 133 / 255.0, 63 / 255.0, 1.0);
+    glm::vec4 wood_amb = glm::vec4(205 / 255.0, 133 / 255.0, 63 / 255.0, 1.0);
+    glm::vec4 wood_diff = glm::vec4(205 / 255.0, 133 / 255.0, 63 / 255.0, 1.0);
+    glm::vec4 wood_spec = glm::vec4(205 / 255.0, 133 / 255.0, 63 / 255.0, 1.0);
+    float wood_shininess = 2.0f;
+    m_ch_cube = new CgCube(idCounter++);
+    m_ch_king = new CgLoadedObj(idCounter++);
+    loadObject(m_ch_king, getObjectDirectory() /= "King.obj");
+    m_ch_queen = new CgLoadedObj(idCounter++);
+    loadObject(m_ch_queen, getObjectDirectory() /= "Queen.obj");
+    CgScenegraphNode *table = new CgScenegraphNode(std::vector<CgBaseRenderableObject *>{m_ch_cube}, glm::mat4(1.), CgAppearance(brown, wood_amb, wood_diff, wood_spec, wood_shininess), NULL);
+    CgScenegraphNode *king = new CgScenegraphNode(std::vector<CgBaseRenderableObject *>{m_ch_king}, glm::mat4(1.), CgAppearance(brown, wood_amb, wood_diff, wood_spec, wood_shininess), table);
+    CgScenegraphNode *queen = new CgScenegraphNode(std::vector<CgBaseRenderableObject *>{m_ch_queen}, glm::translate(glm::mat4(1.), glm::vec3(2.0, 0.0, 0.0)), CgAppearance(brown, wood_amb, wood_diff, wood_spec, wood_shininess), table);
+    table->addChild(king);
+    table->addChild(queen);
+    m_chess_scenegraph = new CgScenegraph(table);
+}
+
+void CgSceneControl::loadObject(CgLoadedObj *obj, std::string filename)
+{
+    ObjLoader *loader = new ObjLoader();
+    loader->load(filename);
+
+    std::cout << "loading .obj: " << filename << std::endl;
+
+    std::vector<glm::vec3> pos;
+    loader->getPositionData(pos);
+
+    std::vector<glm::vec3> norm;
+    loader->getNormalData(norm);
+
+    std::vector<unsigned int> indx;
+    loader->getFaceIndexData(indx);
+
+    obj->init(pos, norm, indx);
+}
+
+fs::path CgSceneControl::getObjectDirectory()
+{
+    return fs::current_path() /= "CgData";
 }
