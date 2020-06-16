@@ -122,17 +122,18 @@ void CgSceneControl::setRenderer(CgBaseRenderer *r)
         m_renderer->init(m_ch_cube);
         m_renderer->init(m_ch_king);
         m_renderer->init(m_ch_queen);
-        // CgLoadedObj *m_ch_rook;
-        // CgLoadedObj *m_ch_bishop;
-        // CgLoadedObj *m_ch_knight;
-        // CgSolidOfRevolution *m_ch_pawn;
+        m_renderer->init(m_ch_rook);
+        m_renderer->init(m_ch_bishop);
+        m_renderer->init(m_ch_knight);
+        m_renderer->init(m_ch_pawn);
+        m_renderer->init(m_ch_player);
     }
 }
 
 void CgSceneControl::renderObjects()
 {
     // Materialeigenschaften setzen
-    m_renderer->setUniformValue("lightpos", glm::vec4(0.0, -10.0, 10.0, 1.0));
+    m_renderer->setUniformValue("lightpos", glm::vec4(20.0, 40.0, 20.0, 1.0));
 
     glm::mat4 mv_matrix = m_lookAt_matrix * m_trackball_rotation * m_current_transformation;
     glm::mat3 normal_matrix = glm::transpose(glm::inverse(glm::mat3(mv_matrix)));
@@ -191,33 +192,35 @@ void CgSceneControl::handleEvent(CgBaseEvent *e)
 
             m_current_transformation = m_current_transformation * scalemat;
         }
+        auto node = m_cursor->getCurNode();
+        auto cur = node->getCurrentTransformation();
         if (ev->text() == "n")
         {
             m_cursor->next();
         }
         if (ev->text() == "q")
         {
-            scale(m_cursor->getCurNode(), glm::vec3(1.2, 1.2, 1.2));
+            node->setCurrentTransformation(scale(cur, node->getCentroid(), glm::vec3(1.2, 1.2, 1.2)));
         }
         if (ev->text() == "w")
         {
-            scale(m_cursor->getCurNode(), glm::vec3(0.8, 0.8, 0.8));
+            node->setCurrentTransformation(scale(cur, node->getCentroid(), glm::vec3(0.8, 0.8, 0.8)));
         }
         if (ev->text() == "t")
         {
-            translate(m_cursor->getCurNode(), m_cur_translation);
+            node->setCurrentTransformation(translate(cur, m_cur_translation));
         }
         if (ev->text() == "x")
         {
-            rotate(m_cursor->getCurNode(), glm::vec3(1.0, 0.0, 0.0));
+            node->setCurrentTransformation(rotate(cur, glm::vec3(1.0, 0.0, 0.0)));
         }
         if (ev->text() == "y")
         {
-            rotate(m_cursor->getCurNode(), glm::vec3(0.0, 1.0, 0.0));
+            node->setCurrentTransformation(rotate(cur, glm::vec3(0.0, 1.0, 0.0)));
         }
         if (ev->text() == "z")
         {
-            rotate(m_cursor->getCurNode(), glm::vec3(0.0, 0.0, 1.0));
+            node->setCurrentTransformation(rotate(cur, glm::vec3(0.0, 0.0, 1.0)));
         }
         m_renderer->redraw();
     }
@@ -487,25 +490,119 @@ void CgSceneControl::buildVertexNormals()
 
 void CgSceneControl::buildChessScene()
 {
-    // colors
+    // colors & materials
     glm::vec4 brown = glm::vec4(205 / 255.0, 133 / 255.0, 63 / 255.0, 1.0);
     glm::vec4 wood_amb = glm::vec4(205 / 255.0, 133 / 255.0, 63 / 255.0, 1.0);
     glm::vec4 wood_diff = glm::vec4(205 / 255.0, 133 / 255.0, 63 / 255.0, 1.0);
     glm::vec4 wood_spec = glm::vec4(0.0, 0.0, 0.0, 1.0);
     float wood_shininess = 1.0f;
+
+    glm::vec4 black = glm::vec4(0.1, 0.1, 0.1, 1.0);
+    glm::vec4 black_amb = glm::vec4(0.02, 0.02, 0.02, 1.0);
+    glm::vec4 black_diff = glm::vec4(0.01, 0.01, 0.01, 1.0);
+    glm::vec4 black_spec = glm::vec4(0.4, 0.4, 0.4, 1.0);
+    float black_shininess = 10.0f;
+
+    glm::vec4 white = glm::vec4(1.0, 1.0, 1.0, 1.0);
+    glm::vec4 white_amb = glm::vec4(0.25, 0.21, 0.21, 0.9);
+    glm::vec4 white_diff = glm::vec4(0.99, 0.83, 0.83, 1.0);
+    glm::vec4 white_spec = glm::vec4(0.3, 0.3, 0.3, 0.9);
+    float white_shininess = 11.3f;
+
+    auto board_colors = std::vector<CgAppearance>{CgAppearance(white, white_amb, white_diff, white_spec, white_shininess), CgAppearance(black, black_amb, black_diff, black_spec, black_shininess)};
+    // objects
     m_ch_cube = new CgCube(idCounter++);
     m_ch_king = new CgLoadedObj(idCounter++);
     loadObject(m_ch_king, getObjectDirectory() /= "King.obj");
     m_ch_queen = new CgLoadedObj(idCounter++);
     loadObject(m_ch_queen, getObjectDirectory() /= "Queen.obj");
-    CgScenegraphNode *table = new CgScenegraphNode(std::vector<CgBaseRenderableObject *>{m_ch_cube}, glm::mat4(1.), CgAppearance(brown, wood_amb, wood_diff, wood_spec, wood_shininess), NULL);
-    CgScenegraphNode *king = new CgScenegraphNode(std::vector<CgBaseRenderableObject *>{m_ch_king}, glm::mat4(1.), CgAppearance(brown, wood_amb, wood_diff, wood_spec, wood_shininess), table);
-    CgScenegraphNode *queen = new CgScenegraphNode(std::vector<CgBaseRenderableObject *>{m_ch_queen}, glm::translate(glm::mat4(1.), glm::vec3(2.0, 0.0, 0.0)), CgAppearance(brown, wood_amb, wood_diff, wood_spec, wood_shininess), table);
-    CgScenegraphNode *leg = new CgScenegraphNode(std::vector<CgBaseRenderableObject *>{m_ch_cube}, glm::translate(glm::mat4(1.), glm::vec3(3.0, 0.0, 0.0)), CgAppearance(brown, wood_amb, wood_diff, wood_spec, wood_shininess), table);
-    table->addChild(king);
-    table->addChild(queen);
-    table->addChild(leg);
-    m_chess_scenegraph = new CgScenegraph(table);
+    m_ch_knight = new CgLoadedObj(idCounter++);
+    loadObject(m_ch_knight, getObjectDirectory() /= "Knight.obj");
+    m_ch_bishop = new CgLoadedObj(idCounter++);
+    loadObject(m_ch_bishop, getObjectDirectory() /= "Bishop.obj");
+    m_ch_rook = new CgLoadedObj(idCounter++);
+    loadObject(m_ch_rook, getObjectDirectory() /= "Rook.obj");
+    m_ch_player = new CgLoadedObj(idCounter++);
+    loadObject(m_ch_player, getObjectDirectory() /= "Man_sitting.obj");
+    m_ch_pawn = new CgSolidOfRevolution(
+        idCounter++,
+        new CgPolyline(idCounter++,
+                       std::vector<glm::vec3>{glm::vec3(0.3, 0.0, 0.0), glm::vec3(0.5, 0.2, 0.0), glm::vec3(0.3, 0.25, 0.0), glm::vec3(0.35, 0.35, 0.0), glm::vec3(0.15, 0.5, 0.0), glm::vec3(0.25, 0.55, 0.0), glm::vec3(0.15, 0.6, 0.0), glm::vec3(0.1, 1.0, 0.0), glm::vec3(0.13, 1.25, 0.0), glm::vec3(0.33, 1.3, 0.0), glm::vec3(0.18, 1.4, 0.0), glm::vec3(0.0, 1.5, 0.0)}, glm::vec3(0.0, 1.0, 0.0), 1),
+        30,
+        2,
+        2);
+
+    // graph & nodes
+    CgScenegraphNode *base = new CgScenegraphNode(std::vector<CgBaseRenderableObject *>{m_ch_cube}, CgAppearance(brown, wood_amb, wood_diff, wood_spec, wood_shininess));
+    CgScenegraphNode *table = new CgScenegraphNode(std::vector<CgBaseRenderableObject *>{m_ch_cube}, CgAppearance(brown, wood_amb, wood_diff, wood_spec, wood_shininess));
+    CgScenegraphNode *chair = new CgScenegraphNode(std::vector<CgBaseRenderableObject *>{m_ch_cube}, CgAppearance(brown, wood_amb, wood_diff, wood_spec, wood_shininess));
+    CgScenegraphNode *leg = new CgScenegraphNode(std::vector<CgBaseRenderableObject *>{m_ch_cube}, CgAppearance(brown, wood_amb, wood_diff, wood_spec, wood_shininess));
+    CgScenegraphNode *leg1 = new CgScenegraphNode(std::vector<CgBaseRenderableObject *>{m_ch_cube}, CgAppearance(brown, wood_amb, wood_diff, wood_spec, wood_shininess));
+    CgScenegraphNode *leg2 = new CgScenegraphNode(std::vector<CgBaseRenderableObject *>{m_ch_cube}, CgAppearance(brown, wood_amb, wood_diff, wood_spec, wood_shininess));
+    CgScenegraphNode *leg3 = new CgScenegraphNode(std::vector<CgBaseRenderableObject *>{m_ch_cube}, CgAppearance(brown, wood_amb, wood_diff, wood_spec, wood_shininess));
+    CgScenegraphNode *leg4 = new CgScenegraphNode(std::vector<CgBaseRenderableObject *>{m_ch_cube}, CgAppearance(brown, wood_amb, wood_diff, wood_spec, wood_shininess));
+    CgScenegraphNode *player = new CgScenegraphNode(std::vector<CgBaseRenderableObject *>{m_ch_player}, CgAppearance(brown, wood_amb, wood_diff, wood_spec, wood_shininess));
+
+    base->addChild(table);
+    base->addChild(leg);
+    base->addChild(player);
+    player->addChild(chair);
+    chair->addChild(leg1);
+    leg1->addChild(leg2);
+    leg1->addChild(leg3);
+    leg1->addChild(leg4);
+    m_chess_scenegraph = new CgScenegraph(base);
+
+    auto pieces = std::vector<CgBaseRenderableObject *>{m_ch_rook, m_ch_knight, m_ch_bishop, m_ch_king, m_ch_queen, m_ch_bishop, m_ch_knight, m_ch_rook};
+    glm::mat4 base_scale = scale(glm::mat4(1.), glm::vec3(0.0, 0.0, 0.0), glm::vec3(1.0, 0.5, 1.0)) * glm::translate(glm::mat4(1.), glm::vec3(0.5, 1.0, 0.5));
+    glm::mat4 piece_scale = glm::translate(glm::mat4(1.), glm::vec3(0.0, 0.7, 0.0));
+    for (int i = 0; i < 8; i++)
+    {
+        int start = i % 2;
+        double z_pos = (double)(-4 + i);
+        for (int j = 0; j < 8; j++)
+        {
+            CgBaseRenderableObject *piece = NULL;
+            CgAppearance piece_color = board_colors[i < 4 ? 0 : 1];
+            glm::mat4 piece_transform = piece_scale;
+            if (i == 0 || i == 7)
+            {
+                piece = pieces[j];
+            }
+            if (i == 1 || i == 6)
+            {
+                piece = m_ch_pawn;
+                piece_transform *= glm::translate(glm::mat4(1.), glm::vec3(0.5, 0.0, 0.5));
+            }
+            if (i == 7)
+            {
+                piece_transform *= glm::translate(glm::mat4(1.), glm::vec3(1.0, 0.0, 1.0)) * glm::rotate(glm::mat4(1.), (float)(PI), glm::vec3(0.0, 1.0, 0.0));
+            }
+            double x_pos = (double)(-4 + j);
+            CgAppearance color = board_colors[(start + j) % 2];
+            glm::mat4 translation = glm::translate(glm::mat4(1.), glm::vec3(x_pos, 0.0, z_pos));
+            table->addChild(new CgScenegraphNode(std::vector<CgBaseRenderableObject *>{m_ch_cube}, translation * base_scale, color));
+            if (piece != NULL)
+            {
+                table->addChild(new CgScenegraphNode(std::vector<CgBaseRenderableObject *>{piece}, translation * piece_transform, piece_color));
+            }
+        }
+    }
+
+    // transformations
+    base->setUniqueTransformation(scale(glm::mat4(1.), base->getCentroid(), glm::vec3(8.0, 3.0, 8.0)));
+    table->setUniqueTransformation(scale(glm::mat4(1.), table->getCentroid(), glm::vec3(25.0, 1.0, 25.0)));
+    table->setCurrentTransformation(glm::translate(glm::mat4(1.), glm::vec3(0.0, 28.0, 0.0)));
+    player->setCurrentTransformation(glm::translate(glm::mat4(1.), glm::vec3(0.0, 0.0, -10.0)));
+    leg->setCurrentTransformation(scale(glm::translate(glm::mat4(1.0), glm::vec3(0.0, 14.0, 0.0)), leg->getCentroid(), glm::vec3(3.0, 28.0, 3.0)));
+    leg1->setCurrentTransformation(scale(glm::mat4(1.), leg1->getCentroid(), glm::vec3(3.0, 16.0, 3.0)));
+    leg1->setUniqueTransformation(glm::translate(glm::mat4(1.), glm::vec3(2.0, -0.56, 2.0)));
+    leg2->setUniqueTransformation(glm::translate(glm::mat4(1.), glm::vec3(-2.0, -0.56, 2.0)));
+    leg3->setUniqueTransformation(glm::translate(glm::mat4(1.), glm::vec3(-2.0, -0.56, -2.0)));
+    leg4->setUniqueTransformation(glm::translate(glm::mat4(1.), glm::vec3(2.0, -0.56, -2.0)));
+    chair->setUniqueTransformation(scale(glm::mat4(1.), chair->getCentroid(), glm::vec3(15.0, 2.0, 15.0)));
+    chair->setCurrentTransformation(glm::translate(glm::mat4(1.), glm::vec3(0.0, 16.0, -15.0)));
+    // player->transform(glm::rotate(glm::translate(glm::mat4(1.), glm::vec3(5.0, 0.0, -5.0)), (float)(PI / 5.0), glm::vec3(0.0, 1.0, 0.0));
 }
 
 void CgSceneControl::loadObject(CgLoadedObj *obj, std::string filename)
@@ -532,17 +629,17 @@ fs::path CgSceneControl::getObjectDirectory()
     return fs::current_path() /= "CgData";
 }
 
-void CgSceneControl::translate(CgScenegraphNode *node, glm::vec3 translation)
+glm::mat4 CgSceneControl::translate(glm::mat4 cur, glm::vec3 translation)
 {
-    node->setCurrentTransformation(glm::translate(node->getCurrentTransformation(), translation));
+    return glm::translate(cur, translation);
 }
-void CgSceneControl::scale(CgScenegraphNode *node, glm::vec3 factor)
+glm::mat4 CgSceneControl::scale(glm::mat4 cur, glm::vec3 centroid, glm::vec3 factor)
 {
-    auto pivot = glm::vec3(node->getCentroid().x, 0.0, node->getCentroid().z);
-    node->setCurrentTransformation(glm::translate(glm::scale(glm::translate(node->getCurrentTransformation(), pivot), factor), -pivot));
+    auto pivot = glm::vec3(centroid.x, 0.0, centroid.z);
+    return glm::translate(glm::scale(glm::translate(cur, pivot), factor), -pivot);
 }
 
-void CgSceneControl::rotate(CgScenegraphNode *node, glm::vec3 axis)
+glm::mat4 CgSceneControl::rotate(glm::mat4 cur, glm::vec3 axis)
 {
-    node->setCurrentTransformation(glm::rotate(node->getCurrentTransformation(), (float)(PI / 12.0), axis));
+    return glm::rotate(cur, (float)(PI / 12.0), axis);
 }

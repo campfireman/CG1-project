@@ -41,9 +41,9 @@ public:
     static void loadObject(CgLoadedObj *obj, std::string filename);
     static fs::path getObjectDirectory();
 
-    static void scale(CgScenegraphNode *node, glm::vec3 factor);
-    static void translate(CgScenegraphNode *node, glm::vec3 translation);
-    static void rotate(CgScenegraphNode *node, glm::vec3 axis);
+    static glm::mat4 scale(glm::mat4 cur, glm::vec3 centroid, glm::vec3 factor);
+    static glm::mat4 translate(glm::mat4 cur, glm::vec3 translation);
+    static glm::mat4 rotate(glm::mat4 cur, glm::vec3 axis);
 
     static unsigned int idCounter;
 
@@ -61,6 +61,7 @@ private:
     CgLoadedObj *m_ch_rook;
     CgLoadedObj *m_ch_bishop;
     CgLoadedObj *m_ch_knight;
+    CgLoadedObj *m_ch_player;
     CgSolidOfRevolution *m_ch_pawn;
 
     CgScenegraph *m_cur_scenegraph;

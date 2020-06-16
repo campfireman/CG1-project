@@ -12,6 +12,8 @@ public:
     CgScenegraphNode();
     CgScenegraphNode(std::vector<CgBaseRenderableObject *> objects, glm::mat4 current_transformation, CgAppearance appearance, CgScenegraphNode *parent, std::vector<CgScenegraphNode *> children);
     CgScenegraphNode(std::vector<CgBaseRenderableObject *> objects, glm::mat4 current_transformation, CgAppearance appearance, CgScenegraphNode *parent);
+    CgScenegraphNode(std::vector<CgBaseRenderableObject *> objects, glm::mat4 current_transformation, CgAppearance appearance);
+    CgScenegraphNode(std::vector<CgBaseRenderableObject *> objects, CgAppearance appearance);
 
     std::vector<CgBaseRenderableObject *> &getObjects();
     void addObject(CgBaseRenderableObject *object);
@@ -20,6 +22,9 @@ public:
     glm::mat4 getCurrentTransformation() const;
     void setCurrentTransformation(glm::mat4 transformation);
     void transform(glm::mat4 transformation);
+
+    glm::mat4 getUniqueTransformation() const;
+    void setUniqueTransformation(glm::mat4 transformation);
 
     CgAppearance getAppearance() const;
     void setAppearance(CgAppearance appearance);
@@ -40,6 +45,7 @@ public:
 private:
     std::vector<CgBaseRenderableObject *> m_objects;
     glm::mat4 m_current_transformation;
+    glm::mat4 m_unique_transformation;
     glm::vec3 m_centroid;
 
     CgAppearance m_appearance;

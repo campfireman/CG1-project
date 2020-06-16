@@ -9,11 +9,11 @@ CgScenegraphNode::CgScenegraphNode()
 {
 }
 
-CgScenegraphNode::CgScenegraphNode(std::vector<CgBaseRenderableObject *> objects, glm::mat4 current_transformation, CgAppearance appearance, CgScenegraphNode *parent)
+CgScenegraphNode::CgScenegraphNode(std::vector<CgBaseRenderableObject *> objects, CgAppearance appearance)
 {
     m_objects = objects;
     m_appearance = appearance;
-    m_parent = parent;
+    m_parent = NULL;
     m_children = std::vector<CgScenegraphNode *>{};
     int count = 0;
     glm::vec3 sum = glm::vec3(0.0, 0.0, 0.0);
@@ -31,7 +31,17 @@ CgScenegraphNode::CgScenegraphNode(std::vector<CgBaseRenderableObject *> objects
     }
     m_centroid = sum / (float)count;
 
+    m_current_transformation = glm::mat4(1.);
+    m_unique_transformation = glm::mat4(1.);
+}
+CgScenegraphNode::CgScenegraphNode(std::vector<CgBaseRenderableObject *> objects, glm::mat4 current_transformation, CgAppearance appearance) : CgScenegraphNode(objects, appearance)
+{
+
     m_current_transformation = current_transformation;
+}
+CgScenegraphNode::CgScenegraphNode(std::vector<CgBaseRenderableObject *> objects, glm::mat4 current_transformation, CgAppearance appearance, CgScenegraphNode *parent) : CgScenegraphNode(objects, current_transformation, appearance)
+{
+    parent = parent;
 }
 CgScenegraphNode::CgScenegraphNode(std::vector<CgBaseRenderableObject *> objects, glm::mat4 current_transformation, CgAppearance appearance, CgScenegraphNode *parent, std::vector<CgScenegraphNode *> children) : CgScenegraphNode(objects, current_transformation, appearance, parent)
 {
@@ -70,6 +80,15 @@ void CgScenegraphNode::transform(glm::mat4 transformation)
     m_current_transformation *= transformation;
 }
 
+glm::mat4 CgScenegraphNode::getUniqueTransformation() const
+{
+    return m_unique_transformation;
+}
+void CgScenegraphNode::setUniqueTransformation(glm::mat4 transformation)
+{
+    m_unique_transformation = transformation;
+}
+
 CgAppearance CgScenegraphNode::getAppearance() const
 {
     return m_appearance;
@@ -102,6 +121,7 @@ void CgScenegraphNode::setChildren(std::vector<CgScenegraphNode *> children)
 void CgScenegraphNode::addChild(CgScenegraphNode *child)
 {
     m_children.push_back(child);
+    child->setParent(this);
 }
 void CgScenegraphNode::removeChild(CgScenegraphNode *child)
 {
@@ -109,7 +129,7 @@ void CgScenegraphNode::removeChild(CgScenegraphNode *child)
 }
 void CgScenegraphNode::render(CgBaseRenderer *renderer, glm::mat4 &transformation)
 {
-    renderer->setUniformValue("modelviewMatrix", transformation);
+    renderer->setUniformValue("modelviewMatrix", transformation * m_unique_transformation);
 
     renderer->setUniformValue("mycolor", m_appearance.getBaseColor());
 
