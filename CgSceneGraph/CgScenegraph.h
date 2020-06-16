@@ -1,6 +1,10 @@
+#ifndef CG_SCENEGRAPH_H
+#define CG_SCENEGRAPH_H
+
 #include "CgScenegraphNode.h"
 #include "CgBase/CgBaseRenderer.h"
 #include <stack>
+#include <tuple>
 
 class CgScenegraph
 {
@@ -15,10 +19,6 @@ public:
 
 private:
     CgScenegraphNode *m_root_node;
-    std::stack<glm::mat4> m_stack;
-
-    void pushMatrix();
-    void popMatrix();
-    void applyTransformation(glm::mat4 transformation);
-    void render_rec(CgBaseRenderer *renderer, CgScenegraphNode *node);
+    std::stack<std::tuple<CgScenegraphNode *, glm::mat4>> m_stack;
 };
+#endif

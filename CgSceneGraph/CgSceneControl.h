@@ -7,6 +7,7 @@
 #include "CgScenegraph.h"
 #include "CgAppearance.h"
 #include "CgScenegraphNode.h"
+#include "CgNodeCursor.h"
 
 #include <glm/glm.hpp>
 #include <vector>
@@ -30,7 +31,7 @@ public:
     void setRenderer(CgBaseRenderer *r);
     void renderObjects();
 
-    void resetCurNode();
+    void resetCursor();
 
     void buildFaceNormals();
     void buildVertexNormals();
@@ -39,6 +40,10 @@ public:
 
     static void loadObject(CgLoadedObj *obj, std::string filename);
     static fs::path getObjectDirectory();
+
+    static void scale(CgScenegraphNode *node, glm::vec3 factor);
+    static void translate(CgScenegraphNode *node, glm::vec3 translation);
+    static void rotate(CgScenegraphNode *node, glm::vec3 axis);
 
     static unsigned int idCounter;
 
@@ -64,7 +69,10 @@ private:
     CgScenegraphNode *m_cube_node;
     CgScenegraphNode *m_solid_of_revolution_node;
     CgScenegraphNode *m_loaded_obj_node;
-    CgScenegraphNode *m_cur_node;
+
+    std::vector<CgBaseRenderableObject *> *m_local_coordinates;
+
+    CgNodeCursor *m_cursor;
 
     CgScenegraphNode *m_face_normals;
     CgScenegraphNode *m_vertex_normals;

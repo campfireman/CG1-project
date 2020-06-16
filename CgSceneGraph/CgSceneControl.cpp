@@ -71,11 +71,15 @@ CgSceneControl::CgSceneControl() : m_cur_color(glm::vec4(0.0, 1.0, 0.0, 1.0))
                      glm::vec4(0.35, 0.31, 0.09, 1.0),
                      glm::vec4(0.8, 0.72, 0.21, 1.0), 5),
         NULL);
-    m_curr_obj = NULL;
+    m_local_coordinates = new std::vector<CgBaseRenderableObject *>{
+        new CgPolyline(idCounter++, std::vector<glm::vec3>{glm::vec3(0.0, 0.0, 0.0), glm::vec3(5.0, 0.0, 0.0)}, glm::vec3(1.0, 1.0, 1.0), 1),
+        new CgPolyline(idCounter++, std::vector<glm::vec3>{glm::vec3(0.0, 0.0, 0.0), glm::vec3(0.0, 5.0, 0.0)}, glm::vec3(1.0, 1.0, 1.0), 1),
+        new CgPolyline(idCounter++, std::vector<glm::vec3>{glm::vec3(0.0, 0.0, 0.0), glm::vec3(0.0, 0.0, 5.0)}, glm::vec3(1.0, 1.0, 1.0), 1)};
     buildChessScene();
     m_object_scenegraph = new CgScenegraph(m_cube_node);
     m_cur_scenegraph = m_object_scenegraph;
-    this->resetCurNode();
+    m_cursor = NULL;
+    this->resetCursor();
 }
 
 CgSceneControl::~CgSceneControl()
@@ -102,6 +106,14 @@ void CgSceneControl::setRenderer(CgBaseRenderer *r)
     if (m_solid_of_revolution != NULL)
     {
         m_renderer->init(m_solid_of_revolution);
+    }
+
+    if (m_local_coordinates != NULL)
+    {
+        for (auto &line : *m_local_coordinates)
+        {
+            m_renderer->init(line);
+        }
     }
 
     if (m_chess_scenegraph != NULL)
@@ -170,7 +182,6 @@ void CgSceneControl::handleEvent(CgBaseEvent *e)
             glm::mat4 scalemat = glm::mat4(1.);
             scalemat = glm::scale(scalemat, glm::vec3(1.2, 1.2, 1.2));
             m_current_transformation = m_current_transformation * scalemat;
-            m_renderer->redraw();
         }
         if (ev->text() == "-")
         {
@@ -178,10 +189,36 @@ void CgSceneControl::handleEvent(CgBaseEvent *e)
             scalemat = glm::scale(scalemat, glm::vec3(0.8, 0.8, 0.8));
 
             m_current_transformation = m_current_transformation * scalemat;
-
-            m_renderer->redraw();
         }
-        // hier kommt jetzt die Abarbeitung des Events hin...
+        if (ev->text() == "n")
+        {
+            m_cursor->next();
+        }
+        if (ev->text() == "q")
+        {
+            scale(m_cursor->getCurNode(), glm::vec3(1.2, 1.2, 1.2));
+        }
+        if (ev->text() == "w")
+        {
+            scale(m_cursor->getCurNode(), glm::vec3(0.8, 0.8, 0.8));
+        }
+        if (ev->text() == "t")
+        {
+            translate(m_cursor->getCurNode(), glm::vec3(1.0, 0.0, 0.0));
+        }
+        if (ev->text() == "x")
+        {
+            rotate(m_cursor->getCurNode(), glm::vec3(1.0, 0.0, 0.0));
+        }
+        if (ev->text() == "y")
+        {
+            rotate(m_cursor->getCurNode(), glm::vec3(0.0, 1.0, 0.0));
+        }
+        if (ev->text() == "z")
+        {
+            rotate(m_cursor->getCurNode(), glm::vec3(0.0, 0.0, 1.0));
+        }
+        m_renderer->redraw();
     }
 
     if (e->getType() & Cg::WindowResizeEvent)
@@ -270,8 +307,8 @@ void CgSceneControl::handleEvent(CgBaseEvent *e)
             {
                 m_object_scenegraph->setRootNode(m_loaded_obj_node);
             }
-            this->resetCurNode();
-            m_cur_node->setColor(m_cur_color);
+            this->resetCursor();
+            m_cursor->getCurNode()->setColor(m_cur_color);
             this->rebuildNormals();
         }
         if (type == Cg::Scene)
@@ -286,6 +323,7 @@ void CgSceneControl::handleEvent(CgBaseEvent *e)
                 std::cout << "chess" << std::endl;
                 m_cur_scenegraph = m_chess_scenegraph;
             }
+            this->resetCursor();
         }
     }
 
@@ -339,17 +377,22 @@ void CgSceneControl::handleEvent(CgBaseEvent *e)
         CgColorChangeEvent *ev = (CgColorChangeEvent *)e;
         std::cout << ev->getValue() << std::endl;
         m_cur_color[ev->getColor()] = ev->getValue() / 255.0;
-        m_cur_node->setColor(m_cur_color);
+        m_cursor->getCurNode()->setColor(m_cur_color);
     }
     // an der Stelle an der ein Event abgearbeitet ist wird es auch gelöscht.
     delete e;
 }
 
-void CgSceneControl::resetCurNode()
+void CgSceneControl::resetCursor()
 {
     if (m_cur_scenegraph != NULL)
     {
-        m_cur_node = m_cur_scenegraph->getRootNode();
+        if (m_cursor != NULL)
+        {
+            delete m_cursor;
+            m_cursor = NULL;
+        }
+        m_cursor = new CgNodeCursor(m_cur_scenegraph, m_local_coordinates);
     }
 }
 
@@ -369,12 +412,12 @@ void CgSceneControl::rebuildNormals()
 
 void CgSceneControl::buildFaceNormals()
 {
-    if (m_cur_node == NULL)
+    if (m_cursor->getCurNode() == NULL)
     {
         return;
     }
     auto face_normals = std::vector<CgBaseRenderableObject *>{};
-    for (auto &object : m_cur_node->getObjects())
+    for (auto &object : m_cursor->getCurNode()->getObjects())
     {
         auto obj = dynamic_cast<CgBaseTriangleMesh *>(object);
         if (obj == NULL)
@@ -398,19 +441,19 @@ void CgSceneControl::buildFaceNormals()
             face_normals.push_back(line);
         }
     }
-    auto normals = new CgScenegraphNode(face_normals, glm::mat4(1.), m_cur_node->getAppearance(), m_cur_node);
-    m_cur_node->addChild(normals);
+    auto normals = new CgScenegraphNode(face_normals, glm::mat4(1.), m_cursor->getCurNode()->getAppearance(), m_cursor->getCurNode());
+    m_cursor->getCurNode()->addChild(normals);
     m_face_normals = normals;
 }
 
 void CgSceneControl::buildVertexNormals()
 {
-    if (m_cur_node == NULL)
+    if (m_cursor->getCurNode() == NULL)
     {
         return;
     }
     auto vertex_normals = std::vector<CgBaseRenderableObject *>{};
-    for (auto &object : m_cur_node->getObjects())
+    for (auto &object : m_cursor->getCurNode()->getObjects())
     {
         auto obj = dynamic_cast<CgBaseTriangleMesh *>(object);
         if (obj == NULL)
@@ -429,8 +472,8 @@ void CgSceneControl::buildVertexNormals()
             vertex_normals.push_back(line);
         }
     }
-    auto normals = new CgScenegraphNode(vertex_normals, glm::mat4(1.), m_cur_node->getAppearance(), m_cur_node);
-    m_cur_node->addChild(normals);
+    auto normals = new CgScenegraphNode(vertex_normals, glm::mat4(1.), m_cursor->getCurNode()->getAppearance(), m_cursor->getCurNode());
+    m_cursor->getCurNode()->addChild(normals);
     m_vertex_normals = normals;
 }
 
@@ -440,8 +483,8 @@ void CgSceneControl::buildChessScene()
     glm::vec4 brown = glm::vec4(205 / 255.0, 133 / 255.0, 63 / 255.0, 1.0);
     glm::vec4 wood_amb = glm::vec4(205 / 255.0, 133 / 255.0, 63 / 255.0, 1.0);
     glm::vec4 wood_diff = glm::vec4(205 / 255.0, 133 / 255.0, 63 / 255.0, 1.0);
-    glm::vec4 wood_spec = glm::vec4(205 / 255.0, 133 / 255.0, 63 / 255.0, 1.0);
-    float wood_shininess = 2.0f;
+    glm::vec4 wood_spec = glm::vec4(0.0, 0.0, 0.0, 1.0);
+    float wood_shininess = 1.0f;
     m_ch_cube = new CgCube(idCounter++);
     m_ch_king = new CgLoadedObj(idCounter++);
     loadObject(m_ch_king, getObjectDirectory() /= "King.obj");
@@ -450,8 +493,10 @@ void CgSceneControl::buildChessScene()
     CgScenegraphNode *table = new CgScenegraphNode(std::vector<CgBaseRenderableObject *>{m_ch_cube}, glm::mat4(1.), CgAppearance(brown, wood_amb, wood_diff, wood_spec, wood_shininess), NULL);
     CgScenegraphNode *king = new CgScenegraphNode(std::vector<CgBaseRenderableObject *>{m_ch_king}, glm::mat4(1.), CgAppearance(brown, wood_amb, wood_diff, wood_spec, wood_shininess), table);
     CgScenegraphNode *queen = new CgScenegraphNode(std::vector<CgBaseRenderableObject *>{m_ch_queen}, glm::translate(glm::mat4(1.), glm::vec3(2.0, 0.0, 0.0)), CgAppearance(brown, wood_amb, wood_diff, wood_spec, wood_shininess), table);
+    CgScenegraphNode *leg = new CgScenegraphNode(std::vector<CgBaseRenderableObject *>{m_ch_cube}, glm::translate(glm::mat4(1.), glm::vec3(3.0, 0.0, 0.0)), CgAppearance(brown, wood_amb, wood_diff, wood_spec, wood_shininess), table);
     table->addChild(king);
     table->addChild(queen);
+    table->addChild(leg);
     m_chess_scenegraph = new CgScenegraph(table);
 }
 
@@ -477,4 +522,22 @@ void CgSceneControl::loadObject(CgLoadedObj *obj, std::string filename)
 fs::path CgSceneControl::getObjectDirectory()
 {
     return fs::current_path() /= "CgData";
+}
+
+// glm::mat4 CgScenegaph::scale(glm::mat4 base, glm::vec3 factor)
+// {
+// }
+void CgSceneControl::translate(CgScenegraphNode *node, glm::vec3 translation)
+{
+    node->setCurrentTransformation(glm::translate(node->getCurrentTransformation(), translation));
+}
+void CgSceneControl::scale(CgScenegraphNode *node, glm::vec3 factor)
+{
+    auto pivot = glm::vec3(0.0, 0.0, 0.0);
+    node->setCurrentTransformation(glm::translate(glm::scale(glm::translate(node->getCurrentTransformation(), -pivot), factor), pivot));
+}
+
+void CgSceneControl::rotate(CgScenegraphNode *node, glm::vec3 axis)
+{
+    node->setCurrentTransformation(glm::rotate(node->getCurrentTransformation(), (float)(PI / 12.0), axis));
 }

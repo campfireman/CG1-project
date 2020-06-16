@@ -20,36 +20,20 @@ void CgScenegraph::setRootNode(CgScenegraphNode *root_node)
     m_root_node = root_node;
 }
 
-void CgScenegraph::pushMatrix()
-{
-    m_stack.push(m_stack.top());
-}
-
-void CgScenegraph::popMatrix()
-{
-    m_stack.pop();
-}
-
-void CgScenegraph::applyTransformation(glm::mat4 transformation)
-{
-    m_stack.top() *= transformation;
-}
-
 void CgScenegraph::render(CgBaseRenderer *renderer, glm::mat4 base)
 {
-    m_stack.push(base);
-
-    render_rec(renderer, m_root_node);
-}
-
-void CgScenegraph::render_rec(CgBaseRenderer *renderer, CgScenegraphNode *node)
-{
-    this->pushMatrix();
-    this->applyTransformation(node->getCurrentTransformation());
-    node->render(renderer, m_stack.top());
-    for (auto &child : node->getChildren())
+    m_stack.push(std::make_tuple(m_root_node, base * m_root_node->getCurrentTransformation()));
+    while (!m_stack.empty())
     {
-        render_rec(renderer, child);
+        auto entry = m_stack.top();
+        auto node = std::get<0>(entry);
+        auto transformation = std::get<1>(entry);
+        node->render(renderer, transformation);
+        m_stack.pop();
+
+        for (auto &child : node->getChildren())
+        {
+            m_stack.push(std::make_tuple(child, transformation * child->getCurrentTransformation()));
+        }
     }
-    this->popMatrix();
 }
