@@ -109,6 +109,11 @@ private slots:
     void slotRGBRedInputChanged(int value);
     void slotRGBGreenInputChanged(int value);
     void slotRGBBlueInputChanged(int value);
+
+    void slotTranslationXInputChanged(int value);
+    void slotTranslationYInputChanged(int value);
+    void slotTranslationZInputChanged(int value);
+
     void slotLateralStepsChanged(int value);
     void slotIterationsChanged(int value);
     void slotNChanged(int value);

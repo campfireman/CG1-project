@@ -14,6 +14,7 @@
 #include "../CgEvents/CgCheckboxChangedEvent.h"
 #include "../CgEvents/CgSelectionChangedEvent.h"
 #include "../CgEvents/CgSORChangedEvent.h"
+#include "../CgEvents/CgTranslationChangedEvent.h"
 #include <QSlider>
 #include <QVBoxLayout>
 #include <QHBoxLayout>
@@ -254,9 +255,35 @@ void CgQtGui::createOptionPanelExample1(QWidget *parent)
     connect(RGBBlueInput, SIGNAL(valueChanged(int)), this, SLOT(slotRGBBlueInputChanged(int)));
     tab1_control->addWidget(RGBBlueInput);
 
+    auto translationXInput = new QSpinBox();
+    tab1_control->addWidget(translationXInput);
+    translationXInput->setMinimum(-255);
+    translationXInput->setMaximum(255);
+    translationXInput->setValue(1);
+    translationXInput->setPrefix("X:  ");
+    connect(translationXInput, SIGNAL(valueChanged(int)), this, SLOT(slotTranslationXInputChanged(int)));
+    tab1_control->addWidget(translationXInput);
+
+    auto translationYInput = new QSpinBox();
+    tab1_control->addWidget(translationYInput);
+    translationYInput->setMinimum(-255);
+    translationYInput->setMaximum(255);
+    translationYInput->setValue(0);
+    translationYInput->setPrefix("Y:  ");
+    connect(translationYInput, SIGNAL(valueChanged(int)), this, SLOT(slotTranslationYInputChanged(int)));
+    tab1_control->addWidget(translationYInput);
+
+    auto translationZInput = new QSpinBox();
+    tab1_control->addWidget(translationZInput);
+    translationZInput->setMinimum(-255);
+    translationZInput->setMaximum(255);
+    translationZInput->setValue(1);
+    translationZInput->setPrefix("Z:  ");
+    connect(translationZInput, SIGNAL(valueChanged(int)), this, SLOT(slotTranslationZInputChanged(int)));
+    tab1_control->addWidget(translationZInput);
+
     QPushButton *drawButton = new QPushButton("Draw!");
     tab1_control->addWidget(drawButton);
-
     connect(drawButton, SIGNAL(clicked()), this, SLOT(slotDrawButtonPressed()));
     /*Example for using a checkbox */
 
@@ -336,6 +363,21 @@ void CgQtGui::slotRGBGreenInputChanged(int value)
 void CgQtGui::slotRGBBlueInputChanged(int value)
 {
     CgBaseEvent *e = new CgColorChangeEvent(Cg::CgColorChangeEvent, Cg::Blue, value);
+    notifyObserver(e);
+}
+void CgQtGui::slotTranslationXInputChanged(int value)
+{
+    CgBaseEvent *e = new CgTranslationChangedEvent(Cg::CgTranslationChangedEvent, Cg::X, value);
+    notifyObserver(e);
+}
+void CgQtGui::slotTranslationYInputChanged(int value)
+{
+    CgBaseEvent *e = new CgTranslationChangedEvent(Cg::CgTranslationChangedEvent, Cg::Y, value);
+    notifyObserver(e);
+}
+void CgQtGui::slotTranslationZInputChanged(int value)
+{
+    CgBaseEvent *e = new CgTranslationChangedEvent(Cg::CgTranslationChangedEvent, Cg::Z, value);
     notifyObserver(e);
 }
 void CgQtGui::slotLateralStepsChanged(int value)

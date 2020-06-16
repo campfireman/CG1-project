@@ -11,6 +11,7 @@
 #include "CgEvents/CgCheckboxChangedEvent.h"
 #include "CgEvents/CgSelectionChangedEvent.h"
 #include "CgEvents/CgSORChangedEvent.h"
+#include "CgEvents/CgTranslationChangedEvent.h"
 #include "CgBase/CgBaseRenderer.h"
 #include "CgExampleTriangle.h"
 #include "CgCube.h"
@@ -25,7 +26,7 @@
 
 unsigned int CgSceneControl::idCounter = 100;
 
-CgSceneControl::CgSceneControl() : m_cur_color(glm::vec4(0.0, 1.0, 0.0, 1.0))
+CgSceneControl::CgSceneControl() : m_cur_color(glm::vec4(0.0, 1.0, 0.0, 1.0)), m_cur_translation(glm::vec3(1.0, 0.0, 1.0))
 {
     // scenery
     m_current_transformation = glm::mat4(1.);
@@ -204,7 +205,7 @@ void CgSceneControl::handleEvent(CgBaseEvent *e)
         }
         if (ev->text() == "t")
         {
-            translate(m_cursor->getCurNode(), glm::vec3(1.0, 0.0, 0.0));
+            translate(m_cursor->getCurNode(), m_cur_translation);
         }
         if (ev->text() == "x")
         {
@@ -379,6 +380,13 @@ void CgSceneControl::handleEvent(CgBaseEvent *e)
         m_cur_color[ev->getColor()] = ev->getValue() / 255.0;
         m_cursor->getCurNode()->setColor(m_cur_color);
     }
+    if (e->getType() == Cg::CgTranslationChangedEvent)
+    {
+        std::cout << "Translation changed event" << std::endl;
+        CgTranslationChangedEvent *ev = (CgTranslationChangedEvent *)e;
+        std::cout << ev->getValue() << std::endl;
+        m_cur_translation[ev->getAxis()] = ev->getValue();
+    }
     // an der Stelle an der ein Event abgearbeitet ist wird es auch gelöscht.
     delete e;
 }
@@ -524,17 +532,14 @@ fs::path CgSceneControl::getObjectDirectory()
     return fs::current_path() /= "CgData";
 }
 
-// glm::mat4 CgScenegaph::scale(glm::mat4 base, glm::vec3 factor)
-// {
-// }
 void CgSceneControl::translate(CgScenegraphNode *node, glm::vec3 translation)
 {
     node->setCurrentTransformation(glm::translate(node->getCurrentTransformation(), translation));
 }
 void CgSceneControl::scale(CgScenegraphNode *node, glm::vec3 factor)
 {
-    auto pivot = glm::vec3(0.0, 0.0, 0.0);
-    node->setCurrentTransformation(glm::translate(glm::scale(glm::translate(node->getCurrentTransformation(), -pivot), factor), pivot));
+    auto pivot = glm::vec3(node->getCentroid().x, 0.0, node->getCentroid().z);
+    node->setCurrentTransformation(glm::translate(glm::scale(glm::translate(node->getCurrentTransformation(), pivot), factor), -pivot));
 }
 
 void CgSceneControl::rotate(CgScenegraphNode *node, glm::vec3 axis)

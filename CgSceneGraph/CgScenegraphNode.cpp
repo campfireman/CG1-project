@@ -1,6 +1,9 @@
 #include "CgScenegraphNode.h"
 #include <algorithm>
 #include <iostream>
+#include "CgBase/CgBaseTriangleMesh.h"
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
 
 CgScenegraphNode::CgScenegraphNode()
 {
@@ -9,10 +12,26 @@ CgScenegraphNode::CgScenegraphNode()
 CgScenegraphNode::CgScenegraphNode(std::vector<CgBaseRenderableObject *> objects, glm::mat4 current_transformation, CgAppearance appearance, CgScenegraphNode *parent)
 {
     m_objects = objects;
-    m_current_transformation = current_transformation;
     m_appearance = appearance;
     m_parent = parent;
     m_children = std::vector<CgScenegraphNode *>{};
+    int count = 0;
+    glm::vec3 sum = glm::vec3(0.0, 0.0, 0.0);
+    for (auto &object : objects)
+    {
+        auto obj = dynamic_cast<CgBaseTriangleMesh *>(object);
+        if (obj != NULL)
+        {
+            for (auto &vertex : obj->getVertices())
+            {
+                count++;
+                sum += vertex;
+            }
+        }
+    }
+    m_centroid = sum / (float)count;
+
+    m_current_transformation = current_transformation;
 }
 CgScenegraphNode::CgScenegraphNode(std::vector<CgBaseRenderableObject *> objects, glm::mat4 current_transformation, CgAppearance appearance, CgScenegraphNode *parent, std::vector<CgScenegraphNode *> children) : CgScenegraphNode(objects, current_transformation, appearance, parent)
 {
@@ -22,6 +41,11 @@ CgScenegraphNode::CgScenegraphNode(std::vector<CgBaseRenderableObject *> objects
 std::vector<CgBaseRenderableObject *> &CgScenegraphNode::getObjects()
 {
     return m_objects;
+}
+
+glm::vec3 CgScenegraphNode::getCentroid() const
+{
+    return m_centroid;
 }
 
 void CgScenegraphNode::addObject(CgBaseRenderableObject *object)

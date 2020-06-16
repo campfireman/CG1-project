@@ -30,6 +30,7 @@ namespace Cg
 		CgCheckboxChangedEvent = 0x0004000,
 		CgSelectionChangedEvent = 0x0008000,
 		CgSORChangedEvent = 0x000f000,
+		CgTranslationChangedEvent = 0x000f001,
 
 		// unused, may be changed to whatever
 
@@ -418,6 +419,12 @@ namespace Cg
 		Iterations,
 		N,
 	} SOROptionType;
+	typedef enum Axis
+	{
+		X,
+		Y,
+		Z
+	} Axis;
 } // namespace Cg
 
 #endif /* CGENUMS_H_ */

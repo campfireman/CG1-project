@@ -77,6 +77,7 @@ private:
     CgScenegraphNode *m_face_normals;
     CgScenegraphNode *m_vertex_normals;
     glm::vec4 m_cur_color;
+    glm::vec3 m_cur_translation;
 
     glm::mat4 m_current_transformation;
     glm::mat4 m_trackball_rotation;

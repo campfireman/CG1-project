@@ -34,6 +34,7 @@ SOURCES += main.cpp \
     CgEvents/CgSelectionChangedEvent.cpp \
     CgEvents/CgButtonPressedEvent.cpp \
     CgEvents/CgSORChangedEvent.cpp \
+    CgEvents/CgTranslationChangedEvent.cpp \
     CgUtils/ObjLoader.cpp \
     CgUtils/Utils.cpp \
     CgEvents/CgTrackballEvent.cpp
@@ -74,6 +75,7 @@ HEADERS += \
     CgEvents/CgCheckboxChangedEvent.h \
     CgEvents/CgSelectionChangedEvent.h \
     CgEvents/CgSORChangedEvent.h \
+    CgEvents/CgTranslationChangedEvent.h \
     CgUtils/ObjLoader.h \
     CgUtils/Utils.h \
     CgBase/CgBaseImage.h \

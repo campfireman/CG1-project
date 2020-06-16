@@ -28,6 +28,8 @@ public:
     CgScenegraphNode *getParent() const;
     void setParent(CgScenegraphNode *parent);
 
+    glm::vec3 getCentroid() const;
+
     std::vector<CgScenegraphNode *> getChildren() const;
     void setChildren(std::vector<CgScenegraphNode *> children);
     void addChild(CgScenegraphNode *child);
@@ -38,6 +40,7 @@ public:
 private:
     std::vector<CgBaseRenderableObject *> m_objects;
     glm::mat4 m_current_transformation;
+    glm::vec3 m_centroid;
 
     CgAppearance m_appearance;
 
