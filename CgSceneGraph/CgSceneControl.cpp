@@ -542,6 +542,13 @@ void CgSceneControl::buildChessScene()
     CgScenegraphNode *leg3 = new CgScenegraphNode(std::vector<CgBaseRenderableObject *>{m_ch_cube}, CgAppearance(brown, wood_amb, wood_diff, wood_spec, wood_shininess));
     CgScenegraphNode *leg4 = new CgScenegraphNode(std::vector<CgBaseRenderableObject *>{m_ch_cube}, CgAppearance(brown, wood_amb, wood_diff, wood_spec, wood_shininess));
     CgScenegraphNode *player = new CgScenegraphNode(std::vector<CgBaseRenderableObject *>{m_ch_player}, CgAppearance(brown, wood_amb, wood_diff, wood_spec, wood_shininess));
+    CgScenegraphNode *box1 = new CgScenegraphNode(std::vector<CgBaseRenderableObject *>{m_ch_cube}, CgAppearance(brown, wood_amb, wood_diff, wood_spec, wood_shininess));
+    CgScenegraphNode *box2 = new CgScenegraphNode(std::vector<CgBaseRenderableObject *>{m_ch_cube}, CgAppearance(brown, wood_amb, wood_diff, wood_spec, wood_shininess));
+    CgScenegraphNode *box3 = new CgScenegraphNode(std::vector<CgBaseRenderableObject *>{m_ch_cube}, CgAppearance(brown, wood_amb, wood_diff, wood_spec, wood_shininess));
+    CgScenegraphNode *box4 = new CgScenegraphNode(std::vector<CgBaseRenderableObject *>{m_ch_cube}, CgAppearance(brown, wood_amb, wood_diff, wood_spec, wood_shininess));
+    CgScenegraphNode *king = new CgScenegraphNode(std::vector<CgBaseRenderableObject *>{m_ch_king}, board_colors[0]);
+    CgScenegraphNode *pawn = new CgScenegraphNode(std::vector<CgBaseRenderableObject *>{m_ch_pawn}, board_colors[1]);
+    CgScenegraphNode *knight = new CgScenegraphNode(std::vector<CgBaseRenderableObject *>{m_ch_knight}, board_colors[1]);
 
     base->addChild(table);
     base->addChild(leg);
@@ -551,6 +558,13 @@ void CgSceneControl::buildChessScene()
     leg1->addChild(leg2);
     leg1->addChild(leg3);
     leg1->addChild(leg4);
+    table->addChild(box1);
+    box1->addChild(box2);
+    box1->addChild(box3);
+    box1->addChild(box4);
+    box1->addChild(king);
+    box1->addChild(pawn);
+    box1->addChild(knight);
     m_chess_scenegraph = new CgScenegraph(base);
 
     auto pieces = std::vector<CgBaseRenderableObject *>{m_ch_rook, m_ch_knight, m_ch_bishop, m_ch_king, m_ch_queen, m_ch_bishop, m_ch_knight, m_ch_rook};
@@ -591,18 +605,36 @@ void CgSceneControl::buildChessScene()
 
     // transformations
     base->setUniqueTransformation(scale(glm::mat4(1.), base->getCentroid(), glm::vec3(8.0, 3.0, 8.0)));
+
     table->setUniqueTransformation(scale(glm::mat4(1.), table->getCentroid(), glm::vec3(25.0, 1.0, 25.0)));
-    table->setCurrentTransformation(glm::translate(glm::mat4(1.), glm::vec3(0.0, 28.0, 0.0)));
-    player->setCurrentTransformation(glm::translate(glm::mat4(1.), glm::vec3(0.0, 0.0, -10.0)));
-    leg->setCurrentTransformation(scale(glm::translate(glm::mat4(1.0), glm::vec3(0.0, 14.0, 0.0)), leg->getCentroid(), glm::vec3(3.0, 28.0, 3.0)));
-    leg1->setCurrentTransformation(scale(glm::mat4(1.), leg1->getCentroid(), glm::vec3(3.0, 16.0, 3.0)));
-    leg1->setUniqueTransformation(glm::translate(glm::mat4(1.), glm::vec3(2.0, -0.56, 2.0)));
-    leg2->setUniqueTransformation(glm::translate(glm::mat4(1.), glm::vec3(-2.0, -0.56, 2.0)));
-    leg3->setUniqueTransformation(glm::translate(glm::mat4(1.), glm::vec3(-2.0, -0.56, -2.0)));
-    leg4->setUniqueTransformation(glm::translate(glm::mat4(1.), glm::vec3(2.0, -0.56, -2.0)));
+    table->setCurrentTransformation(translate(glm::mat4(1.), glm::vec3(0.0, 28.0, 0.0)));
+    leg->setCurrentTransformation(scale(translate(glm::mat4(1.0), glm::vec3(0.0, 14.0, 0.0)), leg->getCentroid(), glm::vec3(3.0, 28.0, 3.0)));
+
+    player->setCurrentTransformation(translate(glm::mat4(1.), glm::vec3(0.0, 0.0, -10.0)));
+
     chair->setUniqueTransformation(scale(glm::mat4(1.), chair->getCentroid(), glm::vec3(15.0, 2.0, 15.0)));
-    chair->setCurrentTransformation(glm::translate(glm::mat4(1.), glm::vec3(0.0, 16.0, -15.0)));
-    // player->transform(glm::rotate(glm::translate(glm::mat4(1.), glm::vec3(5.0, 0.0, -5.0)), (float)(PI / 5.0), glm::vec3(0.0, 1.0, 0.0));
+    chair->setCurrentTransformation(translate(glm::mat4(1.), glm::vec3(0.0, 16.0, -15.0)));
+    leg1->setCurrentTransformation(scale(glm::mat4(1.), leg1->getCentroid(), glm::vec3(3.0, 16.0, 3.0)));
+    leg1->setUniqueTransformation(translate(glm::mat4(1.), glm::vec3(2.0, -0.56, 2.0)));
+    leg2->setUniqueTransformation(translate(glm::mat4(1.), glm::vec3(-2.0, -0.56, 2.0)));
+    leg3->setUniqueTransformation(translate(glm::mat4(1.), glm::vec3(-2.0, -0.56, -2.0)));
+    leg4->setUniqueTransformation(translate(glm::mat4(1.), glm::vec3(2.0, -0.56, -2.0)));
+
+    double box_length = 4.0;
+    double box_thickness = 0.3;
+    double box_height = 2.5;
+    box1->setCurrentTransformation(translate(rotate(glm::mat4(1.), glm::vec3(0.0, 1.0, 0.0)), glm::vec3(6.0, 1.5, 0.0)));
+    box2->setCurrentTransformation(translate(glm::mat4(1.0), glm::vec3(box_length - box_thickness, 0.0, 0.0)));
+    box3->setCurrentTransformation(glm::rotate(translate(glm::mat4(1.), glm::vec3((box_length / 2.0) - box_thickness / 2, 0.0, -(box_length / 2) + box_thickness / 2)), (float)-(PI / 2), glm::vec3(0.0, 1.0, 0.0)));
+    box4->setCurrentTransformation(glm::rotate(translate(glm::mat4(1.), glm::vec3((box_length / 2.0) - box_thickness / 2, 0.0, (box_length / 2) - box_thickness / 2)), (float)(PI / 2), glm::vec3(0.0, 1.0, 0.0)));
+    box1->setUniqueTransformation(scale(glm::mat4(1.), box1->getCentroid(), glm::vec3(box_thickness, box_height, box_length)));
+    box2->setUniqueTransformation(scale(glm::mat4(1.), box2->getCentroid(), glm::vec3(box_thickness, box_height, box_length)));
+    box3->setUniqueTransformation(scale(glm::mat4(1.), box3->getCentroid(), glm::vec3(box_thickness, box_height, box_length)));
+    box4->setUniqueTransformation(scale(glm::mat4(1.), box4->getCentroid(), glm::vec3(box_thickness, box_height, box_length)));
+
+    king->setCurrentTransformation(translate(glm::mat4(1.), glm::vec3(box_length / 2, -box_height / 2, 0.0)));
+    pawn->setCurrentTransformation(glm::rotate(translate(glm::rotate(glm::mat4(1.), -(float)(PI / 7), glm::vec3(0.0, 1.0, 0.0)), glm::vec3(box_length / 3, -box_height / 3.5, -box_length / 3)), -(float)(PI / 2.1), glm::vec3(0.0, 0.0, 1.0)));
+    knight->setCurrentTransformation(glm::rotate(translate(glm::mat4(1.), glm::vec3(box_length / 7, -box_height / 2, -box_length / 3)), (float)(PI / 9), glm::vec3(0.0, 0.0, 1.0)));
 }
 
 void CgSceneControl::loadObject(CgLoadedObj *obj, std::string filename)

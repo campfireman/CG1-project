@@ -129,7 +129,8 @@ void CgScenegraphNode::removeChild(CgScenegraphNode *child)
 }
 void CgScenegraphNode::render(CgBaseRenderer *renderer, glm::mat4 &transformation)
 {
-    renderer->setUniformValue("modelviewMatrix", transformation * m_unique_transformation);
+    auto mv = transformation * m_unique_transformation;
+    renderer->setUniformValue("modelviewMatrix", mv);
 
     renderer->setUniformValue("mycolor", m_appearance.getBaseColor());
 
@@ -139,6 +140,7 @@ void CgScenegraphNode::render(CgBaseRenderer *renderer, glm::mat4 &transformatio
 
     renderer->setUniformValue("matSpecularColor", m_appearance.getMatSpecularColor());
     renderer->setUniformValue("specShininess", m_appearance.getSpecShininess());
+    renderer->setUniformValue("normalMatrix", glm::transpose(glm::inverse(glm::mat3(mv))));
 
     for (CgBaseRenderableObject *&object : m_objects)
     {
