@@ -516,7 +516,7 @@ void CgSceneControl::buildFaceNormals()
             face_normals.push_back(line);
         }
     }
-    auto normals = new CgScenegraphNode(face_normals, glm::mat4(1.), m_cursor->getCurNode()->getAppearance(), m_cursor->getCurNode());
+    auto normals = new CgScenegraphNode(face_normals, m_cursor->getCurNode()->getUniqueTransformation(), m_cursor->getCurNode()->getAppearance(), m_cursor->getCurNode());
     m_cursor->getCurNode()->addChild(normals);
     m_face_normals = normals;
 }
@@ -547,7 +547,7 @@ void CgSceneControl::buildVertexNormals()
             vertex_normals.push_back(line);
         }
     }
-    auto normals = new CgScenegraphNode(vertex_normals, glm::mat4(1.), m_cursor->getCurNode()->getAppearance(), m_cursor->getCurNode());
+    auto normals = new CgScenegraphNode(vertex_normals, m_cursor->getCurNode()->getUniqueTransformation(), m_cursor->getCurNode()->getAppearance(), m_cursor->getCurNode());
     m_cursor->getCurNode()->addChild(normals);
     m_vertex_normals = normals;
 }
