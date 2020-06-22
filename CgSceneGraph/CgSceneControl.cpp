@@ -122,10 +122,6 @@ void CgSceneControl::setRenderer(CgBaseRenderer *r)
     {
         m_renderer->init(m_ball);
     }
-    if (m_ray != NULL)
-    {
-        m_renderer->init(m_ray);
-    }
 
     if (m_local_coordinates != NULL)
     {
@@ -165,10 +161,6 @@ void CgSceneControl::renderObjects()
     {
         m_cur_scenegraph->render(m_renderer, mv_matrix);
     }
-    if (m_ray != NULL)
-    {
-        m_renderer->render(m_ray);
-    }
 }
 
 void CgSceneControl::handleEvent(CgBaseEvent *e)
@@ -190,14 +182,14 @@ void CgSceneControl::handleEvent(CgBaseEvent *e)
             glm::vec3 start = glm::vec3(transformed_eye.x, transformed_eye.y, transformed_eye.z);
             glm::vec3 dir = glm::vec3(clicked_point.x, clicked_point.y, clicked_point.z) - start;
 
-            m_ray = new CgRay(idCounter++, start, dir);
+            auto ray = new CgRay(idCounter++, start, dir);
             if (m_collision_marker != NULL)
             {
                 m_cur_scenegraph->deleteNode(m_collision_marker);
             }
             if (m_cur_scenegraph != NULL)
             {
-                auto collisions = m_ray->collisions(m_cur_scenegraph);
+                auto collisions = ray->collisions(m_cur_scenegraph);
 
                 if (collisions.size() > 0)
                 {
@@ -214,11 +206,18 @@ void CgSceneControl::handleEvent(CgBaseEvent *e)
                     }
                     std::cout << "Distance Eye <-> First Collision: " << smallest << std::endl;
                     m_collision_marker = new CgScenegraphNode(std::vector<CgBaseRenderableObject *>{m_ball}, CgAppearance(glm::vec4(0.0, 1.0, 0.0, 0.0), glm::vec4(0.0, 1.0, 0.0, 0.0), glm::vec4(0.0, 1.0, 0.0, 0.0), glm::vec4(0.0, 1.0, 0.0, 0.0), 2.0f));
+
                     m_collision_marker->setCurrentTransformation(scale(glm::translate(glm::mat4(1.), collisions[index]), m_collision_marker->getCentroid(), glm::vec3(0.2, 0.2, 0.2)));
                     m_cur_scenegraph->getRootNode()->addChild(m_collision_marker);
                 }
             }
-            m_renderer->init(m_ray);
+            if (m_ray != NULL)
+            {
+                m_cur_scenegraph->deleteNode(m_ray);
+            }
+            m_ray = new CgScenegraphNode(std::vector<CgBaseRenderableObject *>{ray}, CgAppearance(glm::vec4(0.0, 1.0, 0.0, 0.0), glm::vec4(0.0, 1.0, 0.0, 0.0), glm::vec4(0.0, 1.0, 0.0, 0.0), glm::vec4(0.0, 1.0, 0.0, 0.0), 2.0f));
+            m_renderer->init(ray);
+            m_cur_scenegraph->getRootNode()->addChild(m_ray);
         }
     }
 

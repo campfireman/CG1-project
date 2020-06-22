@@ -56,7 +56,6 @@ private:
     CgCube *m_cube;
     CgSolidOfRevolution *m_solid_of_revolution;
     CgSolidOfRevolution *m_ball;
-    CgRay *m_ray;
 
     CgCube *m_ch_cube;
     CgLoadedObj *m_ch_king;
@@ -74,6 +73,7 @@ private:
     CgScenegraphNode *m_solid_of_revolution_node;
     CgScenegraphNode *m_loaded_obj_node;
     CgScenegraphNode *m_collision_marker;
+    CgScenegraphNode *m_ray;
 
     std::vector<CgBaseRenderableObject *> *m_local_coordinates;
 
