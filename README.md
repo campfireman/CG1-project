@@ -8,3 +8,5 @@ Mit "x" kann ein Objekt um die x-Achse gedreht werden.
 Mit "y" kann ein Objekt um die y-Achse gedreht werden.
 Mit "z" kann ein Objekt um die z-Achse gedreht werden.
 Mit "t" kann ein Objekt um die den Faktor aus der GUI verschoben werden.
+
+Als standard wurde c++17 verwendet, wenn das Projekt mit qtcreator gebuilded wird, sollte alles automatisch beruecksichtigt werden.
