@@ -190,10 +190,6 @@ void CgSceneControl::handleEvent(CgBaseEvent *e)
             glm::vec3 start = glm::vec3(transformed_eye.x, transformed_eye.y, transformed_eye.z);
             glm::vec3 dir = glm::vec3(clicked_point.x, clicked_point.y, clicked_point.z) - start;
 
-            std::cout << ev->getWindowSizeX() << " " << ev->getWindowSizeY() << std::endl;
-            std::cout << ev->getWindowPosX() << " " << std::endl;
-            // std::cout << start.x << " " << start.y << " " << start.z << std::endl;
-            // std::cout << clicked_point.x << " " << clicked_point.y << " " << clicked_point.z << std::endl;
             m_ray = new CgRay(idCounter++, start, dir);
             if (m_collision_marker != NULL)
             {
