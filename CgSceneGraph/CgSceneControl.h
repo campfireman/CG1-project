@@ -55,6 +55,7 @@ private:
     CgLoadedObj *m_loaded_obj;
     CgCube *m_cube;
     CgSolidOfRevolution *m_solid_of_revolution;
+    CgSolidOfRevolution *m_ball;
     CgRay *m_ray;
 
     CgCube *m_ch_cube;

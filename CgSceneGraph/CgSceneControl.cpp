@@ -44,6 +44,13 @@ CgSceneControl::CgSceneControl() : m_cur_color(glm::vec4(0.0, 1.0, 0.0, 1.0)), m
         20,
         0,
         2);
+    m_ball = new CgSolidOfRevolution(
+        idCounter++,
+        new CgPolyline(idCounter++,
+                       std::vector<glm::vec3>{glm::vec3(0.0, -1.0, 0.0), glm::vec3(1.0, 0.0, 0.0), glm::vec3(0.0, 1.0, 0.0)}, glm::vec3(0.0, 1.0, 0.0), 1),
+        20,
+        3,
+        2);
     m_loaded_obj = new CgLoadedObj(idCounter++);
     m_face_normals = NULL;
     m_vertex_normals = NULL;
@@ -111,6 +118,10 @@ void CgSceneControl::setRenderer(CgBaseRenderer *r)
     {
         m_renderer->init(m_solid_of_revolution);
     }
+    if (m_ball != NULL)
+    {
+        m_renderer->init(m_ball);
+    }
     if (m_ray != NULL)
     {
         m_renderer->init(m_ray);
@@ -172,17 +183,22 @@ void CgSceneControl::handleEvent(CgBaseEvent *e)
         {
             std::cout << "Ray casted!" << std::endl;
 
-            glm::vec4 viewport = glm::vec4(ev->getWindowPos().x - ev->x(), ev->getWindowPos().y - ev->y(), m_viewport_w, m_viewport_h);
+            glm::vec4 viewport = glm::vec4(ev->getWindowPosX() - ev->x(), ev->getWindowPosY() - ev->y(), m_viewport_w, m_viewport_h);
             glm::mat4 model = m_lookAt_matrix * m_trackball_rotation * m_current_transformation;
-            glm::vec3 clicked_point = glm::unProject(glm::vec3(ev->getWindowPos().x, ev->getWindowPos().y, 0.0), model, m_proj_matrix, viewport);
+            glm::vec3 clicked_point = glm::unProject(glm::vec3(ev->getWindowPosX(), ev->getWindowSizeY() - ev->getWindowPosY(), 0.0), model, m_proj_matrix, viewport);
             glm::vec4 transformed_eye = glm::inverse(m_current_transformation * m_trackball_rotation) * glm::vec4(m_eye.x, m_eye.y, m_eye.z, 1.0);
             glm::vec3 start = glm::vec3(transformed_eye.x, transformed_eye.y, transformed_eye.z);
             glm::vec3 dir = glm::vec3(clicked_point.x, clicked_point.y, clicked_point.z) - start;
 
-            // std::cout << ev->getWindowSize().x << " " << ev->getWindowSize().y << std::endl;
+            std::cout << ev->getWindowSizeX() << " " << ev->getWindowSizeY() << std::endl;
+            std::cout << ev->getWindowPosX() << " " << std::endl;
             // std::cout << start.x << " " << start.y << " " << start.z << std::endl;
             // std::cout << clicked_point.x << " " << clicked_point.y << " " << clicked_point.z << std::endl;
             m_ray = new CgRay(idCounter++, start, dir);
+            if (m_collision_marker != NULL)
+            {
+                m_cur_scenegraph->deleteNode(m_collision_marker);
+            }
             if (m_cur_scenegraph != NULL)
             {
                 auto collisions = m_ray->collisions(m_cur_scenegraph);
@@ -200,11 +216,8 @@ void CgSceneControl::handleEvent(CgBaseEvent *e)
                             index = i;
                         }
                     }
-                    if (m_collision_marker != NULL)
-                    {
-                        m_cur_scenegraph->deleteNode(m_collision_marker);
-                    }
-                    m_collision_marker = new CgScenegraphNode(std::vector<CgBaseRenderableObject *>{m_cube}, CgAppearance(glm::vec4(0.0, 1.0, 0.0, 0.0), glm::vec4(0.0, 1.0, 0.0, 0.0), glm::vec4(0.0, 1.0, 0.0, 0.0), glm::vec4(0.0, 1.0, 0.0, 0.0), 2.0f));
+                    std::cout << "Distance Eye <-> First Collision: " << smallest << std::endl;
+                    m_collision_marker = new CgScenegraphNode(std::vector<CgBaseRenderableObject *>{m_ball}, CgAppearance(glm::vec4(0.0, 1.0, 0.0, 0.0), glm::vec4(0.0, 1.0, 0.0, 0.0), glm::vec4(0.0, 1.0, 0.0, 0.0), glm::vec4(0.0, 1.0, 0.0, 0.0), 2.0f));
                     m_collision_marker->setCurrentTransformation(scale(glm::translate(glm::mat4(1.), collisions[index]), m_collision_marker->getCentroid(), glm::vec3(0.2, 0.2, 0.2)));
                     m_cur_scenegraph->getRootNode()->addChild(m_collision_marker);
                 }

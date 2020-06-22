@@ -450,17 +450,12 @@ void CgQtGui::mouseEvent(QMouseEvent *event)
     if (event->type() == QEvent::MouseButtonPress)
     {
 
-        // CgBaseEvent *e = new CgMouseEvent(Cg::CgMouseButtonPress,
-        //                                   glm::vec2(event->localPos().x(), event->localPos().y()),
-        //                                   (Cg::MouseButtons)event->button());
         CgBaseEvent *e = new CgMouseEvent(Cg::CgMouseButtonPress,
                                           glm::vec2(event->localPos().x(), event->localPos().y()),
                                           glm::vec2(event->windowPos().x(), event->windowPos().y()),
                                           glm::vec2(event->screenPos().x(), event->screenPos().y()),
                                           glm::vec2(m_mainWindow->size().width(), m_mainWindow->size().height()),
                                           (Cg::MouseButtons)event->button());
-        // std::cout << m_mainWindow->size().height() << " " << m_mainWindow->size().width() << std::endl;
-        // std::cout << event->screenPos().x() << " " << event->screenPos().y() << std::endl;
         notifyObserver(e);
     }
 

@@ -19,10 +19,12 @@ public:
     int x() const;
     int y() const;
 
-    glm::vec2 getWindowPos() const;
+    int getWindowPosX() const;
+    int getWindowPosY() const;
 
     glm::vec2 getScreenPos() const;
-    glm::vec2 getWindowSize() const;
+    int getWindowSizeX() const;
+    int getWindowSizeY() const;
 
     friend std::ostream &operator<<(std::ostream &os, const CgMouseEvent &e);
 

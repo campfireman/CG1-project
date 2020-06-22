@@ -65,11 +65,8 @@ std::vector<glm::vec3> CgRay::collisions(CgScenegraph *graph)
                     float u = 1.0f - v - w;
                     if (w >= 0 && w <= 1 && u >= 0 && u <= 1 && v >= 0 && v <= 1)
                     {
-                        std::cout << u << std::endl;
-                        std::cout << v << std::endl;
-                        std::cout << w << std::endl;
                         result.push_back(q);
-                        std::cout << obj->getID() << std::endl;
+                        std::cout << "Object ID of triangle: " << obj->getID() << std::endl;
                     }
                 }
             }

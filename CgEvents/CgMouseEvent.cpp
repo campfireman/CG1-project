@@ -1,13 +1,16 @@
 #include "CgMouseEvent.h"
-
+#include <iostream>
 CgMouseEvent::CgMouseEvent(Cg::EventType type, glm::vec2 localPos, Cg::MouseButtons button)
 {
     m_type = type;
     m_localPos = localPos;
     m_button = button;
 }
-CgMouseEvent::CgMouseEvent(Cg::EventType type, glm::vec2 localPos, glm::vec2 windowPos, glm::vec2 screenPos, glm::vec2 windowSize, Cg::MouseButtons button) : CgMouseEvent(type, localPos, button)
+CgMouseEvent::CgMouseEvent(Cg::EventType type, glm::vec2 localPos, glm::vec2 windowPos, glm::vec2 screenPos, glm::vec2 windowSize, Cg::MouseButtons button)
 {
+    m_type = type;
+    m_localPos = localPos;
+    m_button = button;
     m_windowSize = windowSize;
     m_windowPos = windowPos;
     m_screenPos = screenPos;
@@ -15,6 +18,10 @@ CgMouseEvent::CgMouseEvent(Cg::EventType type, glm::vec2 localPos, glm::vec2 win
 
 CgMouseEvent::~CgMouseEvent()
 {
+}
+CgBaseEvent *CgMouseEvent::clone()
+{
+    return new CgMouseEvent(m_type, m_localPos, m_windowPos, m_screenPos, m_windowSize, m_button);
 }
 
 Cg::EventType CgMouseEvent::getType()
@@ -40,17 +47,21 @@ glm::vec2 CgMouseEvent::getScreenPos() const
     return m_screenPos;
 }
 
-glm::vec2 CgMouseEvent::getWindowPos() const
+int CgMouseEvent::getWindowPosX() const
 {
-    return m_windowPos;
+    return m_windowPos.x;
 }
-glm::vec2 CgMouseEvent::getWindowSize() const
+int CgMouseEvent::getWindowPosY() const
 {
-    return m_windowSize;
+    return m_windowPos.y;
 }
-CgBaseEvent *CgMouseEvent::clone()
+int CgMouseEvent::getWindowSizeX() const
 {
-    return new CgMouseEvent(m_type, m_localPos, m_button);
+    return m_windowSize.x;
+}
+int CgMouseEvent::getWindowSizeY() const
+{
+    return m_windowSize.y;
 }
 
 std::ostream &operator<<(std::ostream &os, const CgMouseEvent &e)
