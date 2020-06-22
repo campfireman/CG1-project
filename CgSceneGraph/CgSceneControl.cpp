@@ -206,6 +206,7 @@ void CgSceneControl::handleEvent(CgBaseEvent *e)
                     }
                     std::cout << "Distance Eye <-> First Collision: " << smallest << std::endl;
                     m_collision_marker = new CgScenegraphNode(std::vector<CgBaseRenderableObject *>{m_ball}, CgAppearance(glm::vec4(0.0, 1.0, 0.0, 0.0), glm::vec4(0.0, 1.0, 0.0, 0.0), glm::vec4(0.0, 1.0, 0.0, 0.0), glm::vec4(0.0, 1.0, 0.0, 0.0), 2.0f));
+                    m_collision_marker->is_selectable = false;
 
                     m_collision_marker->setCurrentTransformation(scale(glm::translate(glm::mat4(1.), collisions[index]), m_collision_marker->getCentroid(), glm::vec3(0.2, 0.2, 0.2)));
                     m_cur_scenegraph->getRootNode()->addChild(m_collision_marker);
@@ -216,6 +217,7 @@ void CgSceneControl::handleEvent(CgBaseEvent *e)
                 m_cur_scenegraph->deleteNode(m_ray);
             }
             m_ray = new CgScenegraphNode(std::vector<CgBaseRenderableObject *>{ray}, CgAppearance(glm::vec4(0.0, 1.0, 0.0, 0.0), glm::vec4(0.0, 1.0, 0.0, 0.0), glm::vec4(0.0, 1.0, 0.0, 0.0), glm::vec4(0.0, 1.0, 0.0, 0.0), 2.0f));
+            m_ray->is_selectable = false;
             m_renderer->init(ray);
             m_cur_scenegraph->getRootNode()->addChild(m_ray);
         }
@@ -442,7 +444,8 @@ void CgSceneControl::handleEvent(CgBaseEvent *e)
         CgColorChangeEvent *ev = (CgColorChangeEvent *)e;
         std::cout << ev->getValue() << std::endl;
         m_cur_color[ev->getColor()] = ev->getValue() / 255.0;
-        m_cursor->getCurNode()->setColor(m_cur_color);
+        auto tmp = glm::vec4(m_cur_color.x, m_cur_color.y, m_cur_color.z, 1.0);
+        m_cursor->setPrevAppearance(CgAppearance(tmp, tmp, tmp, tmp, 2.0f));
     }
     if (e->getType() == Cg::CgTranslationChangedEvent)
     {

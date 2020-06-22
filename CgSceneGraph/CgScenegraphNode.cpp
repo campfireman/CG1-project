@@ -15,6 +15,7 @@ CgScenegraphNode::CgScenegraphNode(std::vector<CgBaseRenderableObject *> objects
     m_appearance = appearance;
     m_parent = NULL;
     m_children = std::vector<CgScenegraphNode *>{};
+    is_selectable = true;
     int count = 0;
     glm::vec3 sum = glm::vec3(0.0, 0.0, 0.0);
     for (auto &object : objects)

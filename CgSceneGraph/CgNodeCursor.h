@@ -18,6 +18,8 @@ public:
     CgScenegraphNode *getCurNode() const;
     void setScenegraph(CgScenegraph *scenegraph);
 
+    void setPrevAppearance(CgAppearance app);
+
     void resetStack(CgScenegraphNode *cur_node);
 
 private:

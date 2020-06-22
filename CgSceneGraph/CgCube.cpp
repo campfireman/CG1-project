@@ -45,7 +45,7 @@ CgCube::CgCube(int id) : m_id(id), m_type(Cg::TriangleMesh)
     m_triangle_indices.push_back(4);
     m_triangle_indices.push_back(7);
 
-    // hinten
+    // vorne
     m_triangle_indices.push_back(0);
     m_triangle_indices.push_back(1);
     m_triangle_indices.push_back(5);
@@ -53,7 +53,7 @@ CgCube::CgCube(int id) : m_id(id), m_type(Cg::TriangleMesh)
     m_triangle_indices.push_back(4);
     m_triangle_indices.push_back(0);
 
-    // vorne
+    // hinten
     m_triangle_indices.push_back(3);
     m_triangle_indices.push_back(7);
     m_triangle_indices.push_back(6);

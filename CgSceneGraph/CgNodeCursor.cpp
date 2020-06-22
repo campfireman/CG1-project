@@ -27,12 +27,15 @@ void CgNodeCursor::setCurNode(CgScenegraphNode *node)
     {
         m_scenegraph->deleteNode(m_local_coordinates_node);
     }
-    // this->resetStack(node);
     m_cur_node = node;
     m_prev_appearance = m_cur_node->getAppearance();
     m_cur_node->setAppearance(m_selected_appearance);
 }
 
+void CgNodeCursor::setPrevAppearance(CgAppearance appearance)
+{
+    m_prev_appearance = appearance;
+}
 CgScenegraphNode *CgNodeCursor::getCurNode() const
 {
     return m_cur_node;
@@ -51,30 +54,16 @@ void CgNodeCursor::next()
     {
         m_stack.push(child);
     }
-    m_local_coordinates_node = new CgScenegraphNode(*m_local_coordinates, glm::mat4(1.), m_selected_appearance, node);
+    m_local_coordinates_node = new CgScenegraphNode(*m_local_coordinates, node->getUniqueTransformation(), m_selected_appearance, node);
+    m_local_coordinates_node->is_selectable = false;
     node->addChild(m_local_coordinates_node);
+    if (!node->is_selectable)
+    {
+        this->next();
+    }
 }
 
 bool CgNodeCursor::hasNext() const
 {
     return !m_stack.empty();
-}
-
-void CgNodeCursor::resetStack(CgScenegraphNode *cur_node)
-{
-    while (!m_stack.empty())
-    {
-        m_stack.pop();
-    }
-    m_stack.push(m_scenegraph->getRootNode());
-
-    while (m_stack.top() != cur_node)
-    {
-        auto node = m_stack.top();
-        m_stack.pop();
-        for (auto &child : node->getChildren())
-        {
-            m_stack.push(child);
-        }
-    }
 }

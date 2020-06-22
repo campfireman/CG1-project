@@ -41,6 +41,7 @@ public:
     void removeChild(CgScenegraphNode *child);
 
     void render(CgBaseRenderer *renderer, glm::mat4 &transformation);
+    bool is_selectable;
 
 private:
     std::vector<CgBaseRenderableObject *> m_objects;
