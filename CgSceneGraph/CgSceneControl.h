@@ -8,6 +8,7 @@
 #include "CgAppearance.h"
 #include "CgScenegraphNode.h"
 #include "CgNodeCursor.h"
+#include "CgRay.h"
 
 #include <glm/glm.hpp>
 #include <vector>
@@ -54,6 +55,7 @@ private:
     CgLoadedObj *m_loaded_obj;
     CgCube *m_cube;
     CgSolidOfRevolution *m_solid_of_revolution;
+    CgRay *m_ray;
 
     CgCube *m_ch_cube;
     CgLoadedObj *m_ch_king;
@@ -70,6 +72,7 @@ private:
     CgScenegraphNode *m_cube_node;
     CgScenegraphNode *m_solid_of_revolution_node;
     CgScenegraphNode *m_loaded_obj_node;
+    CgScenegraphNode *m_collision_marker;
 
     std::vector<CgBaseRenderableObject *> *m_local_coordinates;
 
@@ -80,6 +83,10 @@ private:
     glm::vec4 m_cur_color;
     glm::vec3 m_cur_translation;
 
+    int m_viewport_w;
+    int m_viewport_h;
+
+    glm::vec3 m_eye;
     glm::mat4 m_current_transformation;
     glm::mat4 m_trackball_rotation;
     glm::mat4 m_lookAt_matrix;

@@ -6,6 +6,10 @@ CgAppearance CgNodeCursor::m_selected_appearance(
     glm::vec4(178 / 255.0, 34 / 255.0, 34 / 255.0, 1.0),
     glm::vec4(178 / 255.0, 34 / 255.0, 34 / 255.0, 1.0),
     1);
+CgNodeCursor::CgNodeCursor(CgScenegraph *scenegraph)
+{
+    m_scenegraph = scenegraph;
+}
 
 CgNodeCursor::CgNodeCursor(CgScenegraph *scenegraph, std::vector<CgBaseRenderableObject *> *local_coordinates) : m_scenegraph(scenegraph),
                                                                                                                  m_cur_node(NULL), m_local_coordinates(local_coordinates), m_local_coordinates_node(NULL)
@@ -49,6 +53,11 @@ void CgNodeCursor::next()
     }
     m_local_coordinates_node = new CgScenegraphNode(*m_local_coordinates, glm::mat4(1.), m_selected_appearance, node);
     node->addChild(m_local_coordinates_node);
+}
+
+bool CgNodeCursor::hasNext() const
+{
+    return !m_stack.empty();
 }
 
 void CgNodeCursor::resetStack(CgScenegraphNode *cur_node)

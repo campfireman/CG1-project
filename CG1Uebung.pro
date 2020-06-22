@@ -25,6 +25,7 @@ SOURCES += main.cpp \
     CgSceneGraph/CgScenegraphNode.cpp \
     CgSceneGraph/CgAppearance.cpp \
     CgSceneGraph/CgNodeCursor.cpp \
+    CgSceneGraph/CgRay.cpp \
     CgQtViewer/CgQtGlBufferObject.cpp \
     CgQtViewer/CgTrackball.cpp \
     CgEvents/CgWindowResizeEvent.cpp \
@@ -61,6 +62,7 @@ HEADERS += \
     CgSceneGraph/CgScenegraphNode.h \
     CgSceneGraph/CgNodeCursor.h \
     CgSceneGraph/CgAppearance.h \
+    CgSceneGraph/CgRay.h \
     CgBase/CgBasePointCloud.h \
     CgBase/CgBaseTriangleMesh.h \
     CgBase/CgBasePolygonMesh.h \

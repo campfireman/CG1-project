@@ -9,8 +9,10 @@
 class CgNodeCursor
 {
 public:
+    CgNodeCursor(CgScenegraph *scenegraph);
     CgNodeCursor(CgScenegraph *scenegraph, std::vector<CgBaseRenderableObject *> *local_coordinates);
     void next();
+    bool hasNext() const;
 
     void setCurNode(CgScenegraphNode *node);
     CgScenegraphNode *getCurNode() const;
