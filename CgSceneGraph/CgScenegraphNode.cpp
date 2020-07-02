@@ -132,6 +132,7 @@ void CgScenegraphNode::render(CgBaseRenderer *renderer, glm::mat4 &transformatio
 {
     auto mv = transformation * m_unique_transformation;
     renderer->setUniformValue("modelviewMatrix", mv);
+    renderer->setUniformValue("normalMatrix", glm::transpose(glm::inverse(glm::mat3(mv))));
 
     renderer->setUniformValue("mycolor", m_appearance.getBaseColor());
 
